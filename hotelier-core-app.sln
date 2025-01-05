@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hotelier-core-app.Service",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hotelier-core-app.Model", "hotelier-core-app.Model\hotelier-core-app.Model.csproj", "{D97909C5-B7E7-4FC0-92C7-8FC773370C27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hotelier-core-app.Migration", "hotelier-core-app.Migration\hotelier-core-app.Migration.csproj", "{562E8305-1516-468F-8A3A-48FF781F39B7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hotelier-core-app.Migrations", "hotelier-core-app.Migrations\hotelier-core-app.Migrations.csproj", "{562E8305-1516-468F-8A3A-48FF781F39B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -12,4 +12,8 @@
     <Folder Include="Queries\Interface\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\hotelier-core-app.Migrations\hotelier-core-app.Migrations.csproj" />
+  </ItemGroup>
+
 </Project>
