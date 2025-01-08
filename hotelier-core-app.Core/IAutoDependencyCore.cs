@@ -1,4 +1,4 @@
-﻿namespace hotelier_core_app.Core.Helpers.Interface
+﻿namespace hotelier_core_app.Core
 {
     public interface IAutoDependencyCore
     {

@@ -8,7 +8,10 @@ namespace hotelier_core_app.Migrations
     {
         public AppDbContext CreateDbContext(string[] args)
         {
-            IConfigurationRoot configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile(@Directory.GetCurrentDirectory() + "/../hotelier-core-app.API/appsettings.json").Build();
+            string jsonPath = "appsettings.json";
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile($"{@Directory.GetCurrentDirectory()}\\{jsonPath}").Build();
             var builder = new DbContextOptionsBuilder<AppDbContext>();
             builder.UseNpgsql(configuration.GetConnectionString("DbConnectionString"));
             return new AppDbContext(builder.Options);
