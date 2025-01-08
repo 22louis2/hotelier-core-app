@@ -1,4 +1,6 @@
 using Asp.Versioning;
+using Autofac.Extensions.DependencyInjection;
+using Autofac;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using hotelier_core_app.API.Helpers;
@@ -9,7 +11,7 @@ using hotelier_core_app.Model;
 using hotelier_core_app.Model.Configs;
 using hotelier_core_app.Model.Entities;
 using hotelier_core_app.Presentation.Controllers;
-using hotelier_core_app.Service.Helpers;
+using hotelier_core_app.Service.AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
@@ -20,6 +22,9 @@ using Microsoft.OpenApi.Models;
 using System.Globalization;
 using System.Text;
 using System.Text.Json.Serialization;
+using hotelier_core_app.Service.AutofacModule;
+using hotelier_core_app.Core.AutofacModule;
+using hotelier_core_app.Domain.AutofacModule;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -118,7 +123,7 @@ builder.Services.AddAuthentication(x =>
 });
 
 builder.Services.AddCors();
-builder.Services.AddAutoMapper(typeof(AutomapperProfile));
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 if (!builder.Environment.IsDevelopment())
 {
@@ -136,6 +141,13 @@ builder.Services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtTokenSettings"));
 
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory())
+        .ConfigureContainer<ContainerBuilder>(builder =>
+        {
+            builder.RegisterModule(new AutofacCoreContainerModule());
+            builder.RegisterModule(new AutofacServiceContainerModule());
+            builder.RegisterModule(new AutofacRepositoryContainerModule());
+        });
 
 var app = builder.Build();
 
