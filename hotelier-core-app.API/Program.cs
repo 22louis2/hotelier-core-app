@@ -25,6 +25,7 @@ using System.Text.Json.Serialization;
 using hotelier_core_app.Service.AutofacModule;
 using hotelier_core_app.Core.AutofacModule;
 using hotelier_core_app.Domain.AutofacModule;
+using hotelier_core_app.Core.Enums;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -121,6 +122,9 @@ builder.Services.AddAuthentication(x =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtTokenSettings:TokenKey"] ?? string.Empty))
     };
 });
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("AdminPolicy", policy => policy.RequireRole(Permission.Admin.ToString()));
 
 builder.Services.AddCors();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
