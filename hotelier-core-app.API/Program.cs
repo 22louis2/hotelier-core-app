@@ -10,7 +10,7 @@ using hotelier_core_app.Migrations;
 using hotelier_core_app.Model;
 using hotelier_core_app.Model.Configs;
 using hotelier_core_app.Model.Entities;
-using hotelier_core_app.Presentation.Controllers;
+using hotelier_core_app.API.Controllers;
 using hotelier_core_app.Service.AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -25,6 +25,7 @@ using System.Text.Json.Serialization;
 using hotelier_core_app.Service.AutofacModule;
 using hotelier_core_app.Core.AutofacModule;
 using hotelier_core_app.Domain.AutofacModule;
+using hotelier_core_app.Core.Enums;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -121,6 +122,9 @@ builder.Services.AddAuthentication(x =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtTokenSettings:TokenKey"] ?? string.Empty))
     };
 });
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("AdminPolicy", policy => policy.RequireRole(Permission.Admin.ToString()));
 
 builder.Services.AddCors();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
