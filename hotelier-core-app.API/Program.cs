@@ -10,7 +10,7 @@ using hotelier_core_app.Migrations;
 using hotelier_core_app.Model;
 using hotelier_core_app.Model.Configs;
 using hotelier_core_app.Model.Entities;
-using hotelier_core_app.Presentation.Controllers;
+using hotelier_core_app.API.Controllers;
 using hotelier_core_app.Service.AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
