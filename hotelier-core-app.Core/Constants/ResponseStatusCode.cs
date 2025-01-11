@@ -53,5 +53,14 @@
         public const string ModuleExist = "041";
         public const string ModuleUpdateValidation = "042";
         public const string NoModuleAccess = "043";
+
+        // Identity Manager
+        public const string IdentityError = "044";
+
+        public const string EmailSent = "045";
+        public const string EmailFailed = "046";
+
+        public const string InvalidCredential = "047";
+        public const string UserEmailNotConfirmed = "048";
     }
 }

@@ -1,8 +1,9 @@
 ﻿namespace hotelier_core_app.Core.Enums
 {
-    public enum Permission
+    public enum UserRole
     {
         Admin = 1,
-        Viewer
+        Staff,
+        Guest
     }
 }

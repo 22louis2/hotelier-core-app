@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\Request\" />
     <Folder Include="Validators\" />
   </ItemGroup>
 
