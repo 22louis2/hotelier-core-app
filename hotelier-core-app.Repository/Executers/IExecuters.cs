@@ -1,20 +1,20 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Npgsql;
 
 namespace hotelier_core_app.Domain.Executers
 {
     public interface IExecuters : IAutoDependencyRepository
     {
-        void ExecuteCommand(string connStr, Action<SqlConnection, SqlTransaction> task);
+        void ExecuteCommand(string connStr, Action<NpgsqlConnection, NpgsqlTransaction> task);
 
-        T ExecuteCommand<T>(string connStr, Func<SqlConnection, SqlTransaction, T> task);
+        T ExecuteCommand<T>(string connStr, Func<NpgsqlConnection, NpgsqlTransaction, T> task);
 
-        Task<T> ExecuteCommandAsync<T>(string connStr, Func<SqlConnection, SqlTransaction, Task<T>> task);
+        Task<T> ExecuteCommandAsync<T>(string connStr, Func<NpgsqlConnection, NpgsqlTransaction, Task<T>> task);
 
         dynamic ExecuteCommand<T>(string connStr, string query, object param);
 
         Task<dynamic> ExecuteCommandAsync<T>(string connStr, string query, object param);
 
-        IEnumerable<T> ExecuteReader<T>(string connStr, Func<SqlConnection, SqlTransaction, IEnumerable<T>> task);
+        IEnumerable<T> ExecuteReader<T>(string connStr, Func<NpgsqlConnection, NpgsqlTransaction, IEnumerable<T>> task);
 
         IEnumerable<T> ExecuteReader<T>(string connStr, string query, object param);
 
@@ -24,10 +24,10 @@ namespace hotelier_core_app.Domain.Executers
 
         Task<T> ExecuteSingleReaderAsync<T>(string connStr, string query, object param);
 
-        Task<IEnumerable<T>> ExecuteReaderAsync<T>(string connStr, Func<SqlConnection, SqlTransaction, Task<IEnumerable<T>>> task);
+        Task<IEnumerable<T>> ExecuteReaderAsync<T>(string connStr, Func<NpgsqlConnection, NpgsqlTransaction, Task<IEnumerable<T>>> task);
 
-        Task<dynamic> ExecuteCommandAsync<T>(string query, object param, SqlTransaction sqlTransaction);
+        Task<dynamic> ExecuteCommandAsync<T>(string query, object param, NpgsqlTransaction sqlTransaction);
 
-        dynamic ExecuteCommand<T>(string query, object param, SqlTransaction sqlTransaction);
+        dynamic ExecuteCommand<T>(string query, object param, NpgsqlTransaction sqlTransaction);
     }
 }

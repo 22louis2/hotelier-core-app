@@ -65,11 +65,8 @@ namespace hotelier_core_app.API.Controllers
             {
                 Action = UserAction.CreateUser,
                 DatePerformed = DateTime.UtcNow,
-                PerformedBy = _tokenHelper.GetUserFullName(Request),
                 IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
-                PerformerEmail = _tokenHelper.GetUserEmail(Request),
-                PerformedAgainst = model.Email,
-                MacAddress = _tokenHelper.GetMacAddress(Request)
+                PerformedAgainst = model.Email
             };
             BaseResponse response = await _userService.CreateUser(model, auditLog);
             return Ok(response);
@@ -107,6 +104,7 @@ namespace hotelier_core_app.API.Controllers
             {
                 Action = UserAction.UserLogin,
                 DatePerformed = DateTime.UtcNow,
+                PerformedBy = model.Email,
                 IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP"
             };
             var (response, refreshToken) = await _userService.Login(model, auditLog);

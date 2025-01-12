@@ -1,8 +1,9 @@
 ﻿using hotelier_core_app.Domain.Commands.Interface;
 using hotelier_core_app.Domain.Executers;
+using hotelier_core_app.Domain.Helpers;
 using hotelier_core_app.Domain.SqlGenerator;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Npgsql;
 using Serilog;
 using System.Reflection;
 
@@ -12,18 +13,13 @@ namespace hotelier_core_app.Domain.Commands.Implementation
     public class DapperDBCommandRepository<TEntity> : IDBCommandRepository<TEntity>, IBaseCommandRepository<TEntity> where TEntity : class
     {
         private readonly IConfiguration _configuration;
-
         private readonly IExecuters _executers;
-
         private readonly string _connectionString;
-
         private readonly ISqlGenerator<TEntity> _sqlGenerator;
 
         private const int UniqueIndexExceptionNumber = 2601;
-
-        private SqlConnection _connection;
-
-        private SqlTransaction _transaction;
+        private NpgsqlConnection _connection;
+        private NpgsqlTransaction _transaction;
 
         public DapperDBCommandRepository(IConfiguration configuration, IExecuters executers, ISqlGenerator<TEntity> sqlGenerator)
         {
@@ -42,7 +38,7 @@ namespace hotelier_core_app.Domain.Commands.Implementation
                 dictionary[item.Key] = item.Value;
             }
 
-            return dictionary["ID"];
+            return dictionary["Id"];
         }
 
         public async Task<object> AddSoftAsync(TEntity entity)
@@ -60,14 +56,14 @@ namespace hotelier_core_app.Domain.Commands.Implementation
                         dictionary[item.Key] = item.Value;
                     }
 
-                    id = dictionary["ID"];
+                    id = dictionary["Id"];
                 }
 
                 return id;
             }
-            catch (SqlException ex)
+            catch (PostgresException ex)
             {
-                if (ex.Number == 2601)
+                if (ex.SqlState == "23505")
                 {
                     SqlQuery uniqueSelectQuery = _sqlGenerator.GetUniqueSelectQuery(entity);
                     TEntity obj2 = await _executers.ExecuteSingleReaderAsync<TEntity>(_connectionString, uniqueSelectQuery.GetSql(), uniqueSelectQuery.Param);
@@ -102,7 +98,7 @@ namespace hotelier_core_app.Domain.Commands.Implementation
                         dictionary[item.Key] = item.Value;
                     }
 
-                    return dictionary["ID"];
+                    return dictionary["Id"];
                 }
 
                 return null;
@@ -128,7 +124,7 @@ namespace hotelier_core_app.Domain.Commands.Implementation
                         dictionary[item.Key] = item.Value;
                     }
 
-                    return dictionary["ID"];
+                    return dictionary["Id"];
                 }
 
                 return null;
@@ -159,17 +155,17 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             }
         }
 
-        public void AddRangeWithTransaction(List<TEntity> entity, SqlTransaction transaction)
+        public void AddRangeWithTransaction(List<TEntity> entity, NpgsqlTransaction transaction)
         {
             throw new NotImplementedException();
         }
 
-        public async Task AddRangeWithTransactionAsync(List<TEntity> entity, SqlTransaction transaction)
+        public async Task AddRangeWithTransactionAsync(List<TEntity> entity, NpgsqlTransaction transaction)
         {
             throw new NotImplementedException();
         }
 
-        public void AddWithTransaction(TEntity entity, SqlTransaction transaction)
+        public void AddWithTransaction(TEntity entity, NpgsqlTransaction transaction)
         {
             try
             {
@@ -182,7 +178,7 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             }
         }
 
-        public async Task AddWithTransactionAsync(TEntity entity, SqlTransaction transaction)
+        public async Task AddWithTransactionAsync(TEntity entity, NpgsqlTransaction transaction)
         {
             try
             {
@@ -195,35 +191,35 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             }
         }
 
-        public SqlTransaction BeginTransaction()
+        public NpgsqlTransaction BeginTransaction()
         {
-            _connection = new SqlConnection(_connectionString);
+            _connection = new NpgsqlConnection(_connectionString);
             _connection.Open();
             return _connection.BeginTransaction();
         }
 
-        public SqlTransaction BeginTransaction(string connectionString)
+        public NpgsqlTransaction BeginTransaction(string connectionString)
         {
-            _connection = new SqlConnection(connectionString);
+            _connection = new NpgsqlConnection(connectionString);
             _connection.Open();
             return _connection.BeginTransaction();
         }
 
-        public async Task<SqlTransaction> BeginTransactionAsync()
+        public async Task<NpgsqlTransaction> BeginTransactionAsync()
         {
-            _connection = new SqlConnection(_connectionString);
-            _connection.Open();
-            return _connection.BeginTransaction();
+            _connection = new NpgsqlConnection(_connectionString);
+            await _connection.OpenAsync();
+            return await _connection.BeginTransactionAsync();
         }
 
-        public async Task<SqlTransaction> BeginTransactionAsync(string connectionString)
+        public async Task<NpgsqlTransaction> BeginTransactionAsync(string connectionString)
         {
-            _connection = new SqlConnection(connectionString);
-            _connection.Open();
-            return _connection.BeginTransaction();
+            _connection = new NpgsqlConnection(connectionString);
+            await _connection.OpenAsync();
+            return await _connection.BeginTransactionAsync();
         }
 
-        public void CommitTransaction(SqlTransaction sqlTransaction)
+        public void CommitTransaction(NpgsqlTransaction sqlTransaction)
         {
             try
             {
@@ -240,7 +236,7 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             }
         }
 
-        public async Task CommitTransactionAsync(SqlTransaction sqlTransaction)
+        public async Task CommitTransactionAsync(NpgsqlTransaction sqlTransaction)
         {
             try
             {
@@ -267,22 +263,22 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             throw new NotImplementedException();
         }
 
-        public void DeleteWithTransaction(object id, SqlTransaction transaction)
+        public void DeleteWithTransaction(object id, NpgsqlTransaction transaction)
         {
             throw new NotImplementedException();
         }
 
-        public async Task DeleteWithTransactionAsync(object id, SqlTransaction transaction)
+        public async Task DeleteWithTransactionAsync(object id, NpgsqlTransaction transaction)
         {
             throw new NotImplementedException();
         }
 
-        public void RollBackTransaction(SqlTransaction sqlTransaction)
+        public void RollBackTransaction(NpgsqlTransaction sqlTransaction)
         {
             throw new NotImplementedException();
         }
 
-        public async Task RollBackTransactionAsync(SqlTransaction sqlTransaction)
+        public async Task RollBackTransactionAsync(NpgsqlTransaction sqlTransaction)
         {
             throw new NotImplementedException();
         }
@@ -305,7 +301,7 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             }
         }
 
-        public void UpdateWithTransaction(TEntity entity, SqlTransaction transaction)
+        public void UpdateWithTransaction(TEntity entity, NpgsqlTransaction transaction)
         {
             try
             {
@@ -319,7 +315,7 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             }
         }
 
-        public async Task UpdateWithTransactionAsync(TEntity entity, SqlTransaction transaction)
+        public async Task UpdateWithTransactionAsync(TEntity entity, NpgsqlTransaction transaction)
         {
             try
             {
@@ -369,14 +365,33 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             throw new NotImplementedException();
         }
 
-        public void UpdateRangeWithTransaction(IEnumerable<TEntity> entities, SqlTransaction transaction)
+        public void UpdateRangeWithTransaction(IEnumerable<TEntity> entities, NpgsqlTransaction transaction)
         {
             throw new NotImplementedException();
         }
 
-        public Task UpdateRangeWithTransactionAsync(IEnumerable<TEntity> entities, SqlTransaction transaction)
+        public Task UpdateRangeWithTransactionAsync(IEnumerable<TEntity> entities, NpgsqlTransaction transaction)
         {
             throw new NotImplementedException();
+        }
+
+        public void Delete(TEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteRange(List<TEntity> entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AttachEntity(TEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SwitchProvider(DBProvider provider)
+        {
         }
     }
 }

@@ -17,9 +17,9 @@ namespace hotelier_core_app.Domain.SqlGenerator
 
             Expression body = field.Body;
             MemberExpression memberExpression2;
-            if (!(body is MemberExpression memberExpression))
+            if (body is not MemberExpression memberExpression)
             {
-                if (!(body is UnaryExpression unaryExpression))
+                if (body is not UnaryExpression unaryExpression)
                 {
                     throw new ArgumentException("Expression field isn't supported", "field");
                 }
@@ -41,8 +41,7 @@ namespace hotelier_core_app.Domain.SqlGenerator
 
         public static object GetValue(Expression member)
         {
-            string parameterName;
-            return GetValue(member, out parameterName);
+            return GetValue(member, out _);
         }
 
         private static object GetValue(Expression member, out string parameterName)
@@ -53,14 +52,14 @@ namespace hotelier_core_app.Domain.SqlGenerator
                 return null;
             }
 
-            if (!(member is MemberExpression memberExpression))
+            if (member is not MemberExpression memberExpression)
             {
                 if (member is ConstantExpression constantExpression)
                 {
                     return constantExpression.Value;
                 }
 
-                if (!(member is MethodCallExpression methodCallExpression))
+                if (member is not MethodCallExpression methodCallExpression)
                 {
                     if (member is UnaryExpression unaryExpression && (unaryExpression.NodeType == ExpressionType.Convert || unaryExpression.NodeType == ExpressionType.ConvertChecked) && unaryExpression.Type.UnwrapNullableType() == unaryExpression.Operand.Type)
                     {
@@ -100,41 +99,24 @@ namespace hotelier_core_app.Domain.SqlGenerator
 
         public static string GetSqlOperator(ExpressionType type)
         {
-            switch (type)
+            return type switch
             {
-                case ExpressionType.Equal:
-                case ExpressionType.MemberAccess:
-                case ExpressionType.Not:
-                    return "=";
-                case ExpressionType.NotEqual:
-                    return "!=";
-                case ExpressionType.LessThan:
-                    return "<";
-                case ExpressionType.LessThanOrEqual:
-                    return "<=";
-                case ExpressionType.GreaterThan:
-                    return ">";
-                case ExpressionType.GreaterThanOrEqual:
-                    return ">=";
-                case ExpressionType.And:
-                case ExpressionType.AndAlso:
-                    return "AND";
-                case ExpressionType.Or:
-                case ExpressionType.OrElse:
-                    return "OR";
-                case ExpressionType.Default:
-                    return string.Empty;
-                default:
-                    throw new NotSupportedException(type.ToString() + " isn't supported");
-            }
+                ExpressionType.Equal or ExpressionType.MemberAccess or ExpressionType.Not => "=",
+                ExpressionType.NotEqual => "!=",
+                ExpressionType.LessThan => "<",
+                ExpressionType.LessThanOrEqual => "<=",
+                ExpressionType.GreaterThan => ">",
+                ExpressionType.GreaterThanOrEqual => ">=",
+                ExpressionType.And or ExpressionType.AndAlso => "AND",
+                ExpressionType.Or or ExpressionType.OrElse => "OR",
+                ExpressionType.Default => string.Empty,
+                _ => throw new NotSupportedException($"{type} isn't supported"),
+            };
         }
 
         public static string GetSqlLikeValue(string methodName, object value)
         {
-            if (value == null)
-            {
-                value = string.Empty;
-            }
+            value ??= string.Empty;
 
             switch (methodName)
             {

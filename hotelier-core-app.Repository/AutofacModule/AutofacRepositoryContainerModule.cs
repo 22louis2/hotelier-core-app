@@ -35,6 +35,13 @@ namespace hotelier_core_app.Domain.AutofacModule
                 .Keyed(DBProvider.SQL_Dapper, typeof(IDBQueryRepository<>))
                 .InstancePerLifetimeScope();
 
+            builder.RegisterGeneric(typeof(EFCoreCommandRepository<>))
+                .Keyed(DBProvider.SQL_EFCore, typeof(IDBCommandRepository<>))
+                .InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(EFCoreQueryRepository<>))
+                .Keyed(DBProvider.SQL_EFCore, typeof(IDBQueryRepository<>))
+                .InstancePerLifetimeScope();
+
             base.Load(builder);
         }
     }

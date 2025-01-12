@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using hotelier_core_app.Domain.Helpers;
@@ -35,10 +34,16 @@ namespace hotelier_core_app.Domain.SqlGenerator
         public SqlQuery GetInsertQuery(TEntity entity)
         {
             SqlQuery sqlQuery = new SqlQuery(entity);
-            sqlQuery.SqlBuilder.AppendFormat("INSERT INTO {0} ({1}) VALUES ({2})", TableName, string.Join(", ", InsertProperties.Select((PropertyInfo p) => "[" + p.Name + "]")), string.Join(", ", InsertProperties.Select((PropertyInfo p) => "@" + p.Name)));
+            sqlQuery.SqlBuilder.AppendFormat(
+                "INSERT INTO {0} ({1}) VALUES ({2})",
+                TableName,
+                string.Join(", ", InsertProperties.Select(p => $"\"{p.Name}\"")),
+                string.Join(", ", InsertProperties.Select(p => $"@{p.Name}"))
+            );
+
             if (IsNumericType(IdType))
             {
-                sqlQuery.SqlBuilder.Append(" SELECT SCOPE_IDENTITY() AS ID");
+                sqlQuery.SqlBuilder.Append(" RETURNING \"Id\"");
             }
 
             return sqlQuery;
@@ -47,8 +52,7 @@ namespace hotelier_core_app.Domain.SqlGenerator
         public object GetInsertQueryParams(TEntity entity)
         {
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
-            PropertyInfo[] insertProperties = InsertProperties;
-            foreach (PropertyInfo propertyInfo in insertProperties)
+            foreach (PropertyInfo propertyInfo in InsertProperties)
             {
                 dictionary.Add(propertyInfo.Name, propertyInfo.GetValue(entity));
             }
@@ -72,7 +76,7 @@ namespace hotelier_core_app.Domain.SqlGenerator
             }
             else
             {
-                sqlQuery.SqlBuilder.Append("SELECT TOP ").Append(limit).Append(" *");
+                sqlQuery.SqlBuilder.Append($"SELECT * LIMIT {limit}");
             }
 
             if (includes.Length != 0)
@@ -112,7 +116,10 @@ namespace hotelier_core_app.Domain.SqlGenerator
 
         public SqlQuery GetUpdateQuery(TEntity entity)
         {
-            SqlPropertyMetadata[] array = SearchableProperties.Where((SqlPropertyMetadata p) => !KeyProperties.Any((SqlPropertyMetadata k) => k.PropertyName.Equals(p.PropertyName, StringComparison.OrdinalIgnoreCase)) && !p.IgnoreUpdate).ToArray();
+            SqlPropertyMetadata[] array = SearchableProperties.Where((SqlPropertyMetadata p) => !KeyProperties
+                .Any((SqlPropertyMetadata k) => k.PropertyName.Equals(p.PropertyName, StringComparison.OrdinalIgnoreCase)) && 
+                !p.IgnoreUpdate).ToArray();
+
             if (!array.Any())
             {
                 throw new ArgumentException("Can't update without [Key]");
@@ -185,7 +192,7 @@ namespace hotelier_core_app.Domain.SqlGenerator
             }
 
             SqlQuery sqlQuery = new SqlQuery(entity);
-            sqlQuery.SqlBuilder.AppendFormat("SELECT TOP 1 * FROM {0} WHERE {1}", TableName, string.Join(" OR ", list.ToArray()));
+            sqlQuery.SqlBuilder.AppendFormat("SELECT * FROM {0} WHERE {1} LIMIT 1", TableName, string.Join(" OR ", list.ToArray()));
             return sqlQuery;
         }
 
@@ -215,7 +222,7 @@ namespace hotelier_core_app.Domain.SqlGenerator
                 list.Add(string.Format("({0})", string.Join(", ", InsertProperties.Select((PropertyInfo p) => "@" + p.Name + i))));
             }
 
-            sqlQuery.SqlBuilder.AppendFormat("INSERT INTO {0} ({1}) VALUES {2}", TableName, string.Join(", ", InsertProperties.Select((PropertyInfo p) => "[" + p.Name + "]")), string.Join(", ", list));
+            sqlQuery.SqlBuilder.AppendFormat("INSERT INTO {0} ({1}) VALUES {2}", TableName, string.Join(", ", InsertProperties.Select((PropertyInfo p) => $"{p.Name}")), string.Join(", ", list));
             sqlQuery.SetParam(dictionary);
             return sqlQuery;
         }
@@ -617,7 +624,7 @@ namespace hotelier_core_app.Domain.SqlGenerator
             Type typeFromHandle = typeof(TEntity);
             TypeInfo typeInfo = typeFromHandle.GetTypeInfo();
             TableAttribute customAttribute = typeInfo.GetCustomAttribute<TableAttribute>();
-            TableName = ((!string.IsNullOrEmpty(customAttribute?.Schema)) ? customAttribute.Schema : "dbo") + "." + ((!string.IsNullOrEmpty(customAttribute?.Name)) ? customAttribute.Name : typeInfo.Name);
+            TableName = ((!string.IsNullOrEmpty(customAttribute?.Schema)) ? customAttribute.Schema + "." : "") + ((!string.IsNullOrEmpty(customAttribute?.Name)) ? $"\"{customAttribute.Name}\"" : $"\"{typeInfo.Name}\"");
             PropertyInfo[] source = typeFromHandle.FindClassProperties();
             NavigationProperties = source.Where((PropertyInfo p) => p.CanWrite && p.GetCustomAttributes<JoinAttributeBase>().Any()).ToArray();
             InsertProperties = source.Where((PropertyInfo p) => p.CanWrite && !p.GetCustomAttributes<IgnoreDuringInsertAttribute>().Any() && !p.GetCustomAttributes<KeyAttribute>().Any()).ToArray();

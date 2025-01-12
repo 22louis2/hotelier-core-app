@@ -23,6 +23,15 @@ namespace hotelier_core_app.Migrations
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<ApplicationUser>()
+                .Property(u => u.RowVersion)
+                .IsRequired()
+                .IsRowVersion()
+                .HasColumnType("bytea")
+                .HasDefaultValueSql("gen_random_bytes(8)");
+
+            modelBuilder.Entity<ApplicationUserRole>()
+                .HasKey(ur => new { ur.UserId, ur.RoleId });
         }
     }
 }
