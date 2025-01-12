@@ -10,6 +10,7 @@ namespace hotelier_core_app.Migrations
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<Module> Modules { get; set; }
         public DbSet<ModuleGroup> ModuleGroups { get; set; }
+        public DbSet<Tenant> Tenants { get; set; }
 
         public AppDbContext()
         {

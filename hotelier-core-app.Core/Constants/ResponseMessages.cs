@@ -53,5 +53,11 @@
         public const string ModuleExist = "Module already exist";
         public const string ModuleUpdateValidation = "Either of the module field is required";
         public const string NoModuleAccess = "No module access found for user";
+
+        public const string EmailSent = "An email has been successfully sent to the user";
+        public const string EmailFailed = "Failed to send the email. Please try again later";
+
+        public const string InvalidCredential = "Invalid Credentials";
+        public const string UserEmailNotConfirmed = "User's email has not been confirmed";
     }
 }

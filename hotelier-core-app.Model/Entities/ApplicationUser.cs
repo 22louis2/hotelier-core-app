@@ -29,11 +29,17 @@ namespace hotelier_core_app.Model.Entities
         public DateTime? CreationDate { get; set; }
         public DateTime? LastModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
+        public string Picture {  get; set; }
 
         [StringLength(200)]
         public string RefreshToken { get; set; }
 
+
         public ApplicationUserRole UserRole { get; set; }
+
+        [ForeignKey("Tenant")]
+        public long TenantId { get; set; }
+        public Tenant Tenant { get; set; }
 
         public ApplicationUser()
         {
