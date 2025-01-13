@@ -1,27 +1,40 @@
 ﻿using Autofac.Features.Indexed;
 using hotelier_core_app.Domain.Commands.Interface;
 using hotelier_core_app.Domain.Helpers;
-using Microsoft.Data.SqlClient;
+using hotelier_core_app.Domain.Queries.Implementation;
 using Microsoft.Extensions.Configuration;
+using Npgsql;
 
 namespace hotelier_core_app.Domain.Commands.Implementation
 {
 
     public class DBCommandRepository<TEntity> : IDBCommandRepository<TEntity>, IBaseCommandRepository<TEntity> where TEntity : class
     {
-        private readonly IDBCommandRepository<TEntity> _commandRepository;
+        private readonly IIndex<DBProvider, IDBCommandRepository<TEntity>> _commandRepositories;
+        private IDBCommandRepository<TEntity> _commandRepository;
 
         private readonly IConfiguration _configuration;
 
-        public DBCommandRepository(IIndex<DBProvider, IDBCommandRepository<TEntity>> commandRepository, IConfiguration configuration)
+        public DBCommandRepository(IIndex<DBProvider, IDBCommandRepository<TEntity>> commandRepositories, IConfiguration configuration)
         {
+            _commandRepositories = commandRepositories;
             _configuration = configuration;
             if (!Enum.TryParse<DBProvider>(_configuration.GetValue<string>("AppSettings:OrmType"), ignoreCase: true, out var result))
             {
-                result = DBProvider.SQL_Dapper;
+                result = DBProvider.SQL_EFCore;
             }
 
-            _commandRepository = commandRepository[result];
+            _commandRepository = commandRepositories[result];
+        }
+
+        public void SwitchProvider(DBProvider provider)
+        {
+            if (!_commandRepositories.TryGetValue(provider, out var newRepository))
+            {
+                throw new InvalidOperationException($"Provider {provider} is not registered.");
+            }
+
+            _commandRepository = newRepository;
         }
 
         public object AddSoft(TEntity entity)
@@ -46,7 +59,7 @@ namespace hotelier_core_app.Domain.Commands.Implementation
 
         public void AddRange(List<TEntity> entity)
         {
-            throw new NotImplementedException();
+            _commandRepository.AddRange(entity);
         }
 
         public async Task AddRangeAsync(List<TEntity> entity)
@@ -54,52 +67,52 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             await _commandRepository.AddRangeAsync(entity);
         }
 
-        public void AddRangeWithTransaction(List<TEntity> entity, SqlTransaction transaction)
+        public void AddRangeWithTransaction(List<TEntity> entity, NpgsqlTransaction transaction)
         {
             throw new NotImplementedException();
         }
 
-        public Task AddRangeWithTransactionAsync(List<TEntity> entity, SqlTransaction transaction)
+        public Task AddRangeWithTransactionAsync(List<TEntity> entity, NpgsqlTransaction transaction)
         {
             throw new NotImplementedException();
         }
 
-        public void AddWithTransaction(TEntity entity, SqlTransaction transaction)
+        public void AddWithTransaction(TEntity entity, NpgsqlTransaction transaction)
         {
             throw new NotImplementedException();
         }
 
-        public async Task AddWithTransactionAsync(TEntity entity, SqlTransaction transaction)
+        public async Task AddWithTransactionAsync(TEntity entity, NpgsqlTransaction transaction)
         {
             await _commandRepository.AddWithTransactionAsync(entity, transaction);
         }
 
-        public SqlTransaction BeginTransaction()
+        public NpgsqlTransaction BeginTransaction()
         {
             return _commandRepository.BeginTransaction();
         }
 
-        public SqlTransaction BeginTransaction(string connectionString)
+        public NpgsqlTransaction BeginTransaction(string connectionString)
         {
             throw new NotImplementedException();
         }
 
-        public Task<SqlTransaction> BeginTransactionAsync()
+        public Task<NpgsqlTransaction> BeginTransactionAsync()
         {
             return _commandRepository.BeginTransactionAsync();
         }
 
-        public Task<SqlTransaction> BeginTransactionAsync(string connectionString)
+        public Task<NpgsqlTransaction> BeginTransactionAsync(string connectionString)
         {
             throw new NotImplementedException();
         }
 
-        public void CommitTransaction(SqlTransaction sqlTransaction)
+        public void CommitTransaction(NpgsqlTransaction sqlTransaction)
         {
             _commandRepository.CommitTransaction(sqlTransaction);
         }
 
-        public async Task CommitTransactionAsync(SqlTransaction sqlTransaction)
+        public async Task CommitTransactionAsync(NpgsqlTransaction sqlTransaction)
         {
             await _commandRepository.CommitTransactionAsync(sqlTransaction);
         }
@@ -114,39 +127,39 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             throw new NotImplementedException();
         }
 
-        public void DeleteWithTransaction(object id, SqlTransaction transaction)
+        public void DeleteWithTransaction(object id, NpgsqlTransaction transaction)
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteWithTransactionAsync(object id, SqlTransaction transaction)
+        public Task DeleteWithTransactionAsync(object id, NpgsqlTransaction transaction)
         {
             throw new NotImplementedException();
         }
 
-        public void RollBackTransaction(SqlTransaction sqlTransaction)
+        public void RollBackTransaction(NpgsqlTransaction sqlTransaction)
         {
             throw new NotImplementedException();
         }
 
-        public Task RollBackTransactionAsync(SqlTransaction sqlTransaction)
+        public Task RollBackTransactionAsync(NpgsqlTransaction sqlTransaction)
         {
             throw new NotImplementedException();
         }
 
         public int Save()
         {
-            throw new NotImplementedException();
+            return _commandRepository.Save();
         }
 
-        public Task<int> SaveAsync()
+        public async Task<int> SaveAsync()
         {
-            throw new NotImplementedException();
+            return await _commandRepository.SaveAsync();
         }
 
         public void Update(TEntity entity)
         {
-            throw new NotImplementedException();
+            _commandRepository.Update(entity);
         }
 
         public async Task UpdateAsync(TEntity entity)
@@ -154,12 +167,12 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             await _commandRepository.UpdateAsync(entity);
         }
 
-        public void UpdateWithTransaction(TEntity entity, SqlTransaction transaction)
+        public void UpdateWithTransaction(TEntity entity, NpgsqlTransaction transaction)
         {
             throw new NotImplementedException();
         }
 
-        public async Task UpdateWithTransactionAsync(TEntity entity, SqlTransaction transaction)
+        public async Task UpdateWithTransactionAsync(TEntity entity, NpgsqlTransaction transaction)
         {
             await _commandRepository.UpdateWithTransactionAsync(entity, transaction);
         }
@@ -174,14 +187,29 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             await _commandRepository.UpdateRangeAsync(entities);
         }
 
-        public void UpdateRangeWithTransaction(IEnumerable<TEntity> entities, SqlTransaction transaction)
+        public void UpdateRangeWithTransaction(IEnumerable<TEntity> entities, NpgsqlTransaction transaction)
         {
             throw new NotImplementedException();
         }
 
-        public Task UpdateRangeWithTransactionAsync(IEnumerable<TEntity> entities, SqlTransaction transaction)
+        public Task UpdateRangeWithTransactionAsync(IEnumerable<TEntity> entities, NpgsqlTransaction transaction)
         {
             throw new NotImplementedException();
+        }
+
+        public void Delete(TEntity entity)
+        {
+            _commandRepository.Delete(entity);
+        }
+
+        public void DeleteRange(List<TEntity> entity)
+        {
+            _commandRepository.DeleteRange(entity);
+        }
+
+        public void AttachEntity(TEntity entity)
+        {
+            _commandRepository.AttachEntity(entity);
         }
     }
 }

@@ -101,7 +101,6 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
     options.User.RequireUniqueEmail = true;
 })
             .AddEntityFrameworkStores<AppDbContext>()
-            .AddUserManager<UserManager<ApplicationUser>>()
             .AddDefaultTokenProviders();
 builder.Services.AddAuthentication(x =>
 {

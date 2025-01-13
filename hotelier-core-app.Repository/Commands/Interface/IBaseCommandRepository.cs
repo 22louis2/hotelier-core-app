@@ -26,6 +26,12 @@
 
         Task DeleteAsync(object id);
 
+        void Delete(TEntity entity);
+
+        void DeleteRange(List<TEntity> entity);
+
+        void AttachEntity(TEntity entity);
+
         int Save();
 
         Task<int> SaveAsync();

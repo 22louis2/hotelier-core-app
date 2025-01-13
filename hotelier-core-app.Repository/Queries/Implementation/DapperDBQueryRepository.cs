@@ -1,4 +1,5 @@
 ﻿using hotelier_core_app.Domain.Executers;
+using hotelier_core_app.Domain.Helpers;
 using hotelier_core_app.Domain.Queries.Interface;
 using hotelier_core_app.Domain.SqlGenerator;
 using Microsoft.Extensions.Configuration;
@@ -168,6 +169,75 @@ namespace hotelier_core_app.Domain.Queries.Implementation
         public async Task<int> GetNextValueInSequenceAsync(string sequenceName, string connectionString)
         {
             return (await _executers.ExecuteReaderAsync<int>(connectionString, "SELECT NEXT VALUE FOR " + sequenceName, null)).FirstOrDefault();
+        }
+
+        public IQueryable<TEntity> GetAllQueryable()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IQueryable<TEntity> GetAllTrackEntity()
+        {
+            throw new NotImplementedException();
+        }
+
+        public TEntity? GetByDefaultAsNoTracking(Expression<Func<TEntity, bool>> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<TEntity?> GetByDefaultAsNoTrackingAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public TEntity? GetByDefaultIncluding(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IQueryable<TEntity> GetAllIncluding(params Expression<Func<TEntity, object>>[] includeProperties)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<TEntity> AllInclude(params Expression<Func<TEntity, object>>[] includeProperties)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<TEntity> FindByInclude(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IQueryable<TEntity> GetByAllIncluding(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
+        {
+            throw new NotImplementedException();
+        }
+
+        public TEntity? FindWithChildInclude(Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>, IQueryable<TEntity>> includeMembers)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IQueryable<TEntity> GetAllByWithChildInclude(Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>, IQueryable<TEntity>> includeMembers)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IQueryable<TEntity> GetAllWithChildInclude(Func<IQueryable<TEntity>, IQueryable<TEntity>> includeMembers)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IQueryable<TEntity> GetRecordUsingStoredProcedure(string storedProcedure, object[] parameter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SwitchProvider(DBProvider provider)
+        {
         }
     }
 }

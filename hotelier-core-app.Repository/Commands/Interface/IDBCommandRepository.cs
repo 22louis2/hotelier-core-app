@@ -1,43 +1,45 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using hotelier_core_app.Domain.Helpers;
+using Npgsql;
 
 namespace hotelier_core_app.Domain.Commands.Interface
 {
     public interface IDBCommandRepository<TEntity> : IBaseCommandRepository<TEntity> where TEntity : class
     {
-        void AddWithTransaction(TEntity entity, SqlTransaction transaction);
+        void SwitchProvider(DBProvider provider);
+        void AddWithTransaction(TEntity entity, NpgsqlTransaction transaction);
 
-        Task AddWithTransactionAsync(TEntity entity, SqlTransaction transaction);
+        Task AddWithTransactionAsync(TEntity entity, NpgsqlTransaction transaction);
 
-        void AddRangeWithTransaction(List<TEntity> entity, SqlTransaction transaction);
+        void AddRangeWithTransaction(List<TEntity> entity, NpgsqlTransaction transaction);
 
-        Task AddRangeWithTransactionAsync(List<TEntity> entity, SqlTransaction transaction);
+        Task AddRangeWithTransactionAsync(List<TEntity> entity, NpgsqlTransaction transaction);
 
-        void UpdateWithTransaction(TEntity entity, SqlTransaction transaction);
+        void UpdateWithTransaction(TEntity entity, NpgsqlTransaction transaction);
 
-        Task UpdateWithTransactionAsync(TEntity entity, SqlTransaction transaction);
+        Task UpdateWithTransactionAsync(TEntity entity, NpgsqlTransaction transaction);
 
-        void UpdateRangeWithTransaction(IEnumerable<TEntity> entities, SqlTransaction transaction);
+        void UpdateRangeWithTransaction(IEnumerable<TEntity> entities, NpgsqlTransaction transaction);
 
-        Task UpdateRangeWithTransactionAsync(IEnumerable<TEntity> entities, SqlTransaction transaction);
+        Task UpdateRangeWithTransactionAsync(IEnumerable<TEntity> entities, NpgsqlTransaction transaction);
 
-        void DeleteWithTransaction(object id, SqlTransaction transaction);
+        void DeleteWithTransaction(object id, NpgsqlTransaction transaction);
 
-        Task DeleteWithTransactionAsync(object id, SqlTransaction transaction);
+        Task DeleteWithTransactionAsync(object id, NpgsqlTransaction transaction);
 
-        SqlTransaction BeginTransaction();
+        NpgsqlTransaction BeginTransaction();
 
-        Task<SqlTransaction> BeginTransactionAsync();
+        Task<NpgsqlTransaction> BeginTransactionAsync();
 
-        SqlTransaction BeginTransaction(string connectionString);
+        NpgsqlTransaction BeginTransaction(string connectionString);
 
-        Task<SqlTransaction> BeginTransactionAsync(string connectionString);
+        Task<NpgsqlTransaction> BeginTransactionAsync(string connectionString);
 
-        void CommitTransaction(SqlTransaction sqlTransaction);
+        void CommitTransaction(NpgsqlTransaction sqlTransaction);
 
-        Task CommitTransactionAsync(SqlTransaction sqlTransaction);
+        Task CommitTransactionAsync(NpgsqlTransaction sqlTransaction);
 
-        void RollBackTransaction(SqlTransaction sqlTransaction);
+        void RollBackTransaction(NpgsqlTransaction sqlTransaction);
 
-        Task RollBackTransactionAsync(SqlTransaction sqlTransaction);
+        Task RollBackTransactionAsync(NpgsqlTransaction sqlTransaction);
     }
 }

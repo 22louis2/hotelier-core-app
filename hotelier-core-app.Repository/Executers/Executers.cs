@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using hotelier_core_app.Domain.Exceptions;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Npgsql;
 
 namespace hotelier_core_app.Domain.Executers
 {
@@ -14,10 +14,10 @@ namespace hotelier_core_app.Domain.Executers
             _configuration = configuration;
         }
 
-        public void ExecuteCommand(string connStr, Action<SqlConnection, SqlTransaction> task)
+        public void ExecuteCommand(string connStr, Action<NpgsqlConnection, NpgsqlTransaction> task)
         {
-            using SqlConnection sqlConnection = new SqlConnection(connStr);
-            SqlTransaction sqlTransaction = null;
+            using NpgsqlConnection sqlConnection = new NpgsqlConnection(connStr);
+            NpgsqlTransaction sqlTransaction = null;
             try
             {
                 sqlConnection.Open();
@@ -25,7 +25,7 @@ namespace hotelier_core_app.Domain.Executers
                 task(sqlConnection, sqlTransaction);
                 sqlTransaction.Commit();
             }
-            catch (SqlException)
+            catch (PostgresException)
             {
                 if (sqlTransaction?.Connection != null)
                 {
@@ -45,10 +45,10 @@ namespace hotelier_core_app.Domain.Executers
             }
         }
 
-        public T ExecuteCommand<T>(string connStr, Func<SqlConnection, SqlTransaction, T> task)
+        public T ExecuteCommand<T>(string connStr, Func<NpgsqlConnection, NpgsqlTransaction, T> task)
         {
-            using SqlConnection sqlConnection = new SqlConnection(connStr);
-            SqlTransaction sqlTransaction = null;
+            using NpgsqlConnection sqlConnection = new NpgsqlConnection(connStr);
+            NpgsqlTransaction sqlTransaction = null;
             try
             {
                 sqlConnection.Open();
@@ -57,7 +57,7 @@ namespace hotelier_core_app.Domain.Executers
                 sqlTransaction.Commit();
                 return result;
             }
-            catch (SqlException)
+            catch (PostgresException)
             {
                 if (sqlTransaction?.Connection != null)
                 {
@@ -77,10 +77,10 @@ namespace hotelier_core_app.Domain.Executers
             }
         }
 
-        public async Task<T> ExecuteCommandAsync<T>(string connStr, Func<SqlConnection, SqlTransaction, Task<T>> task)
+        public async Task<T> ExecuteCommandAsync<T>(string connStr, Func<NpgsqlConnection, NpgsqlTransaction, Task<T>> task)
         {
-            using SqlConnection conn = new SqlConnection(connStr);
-            SqlTransaction _sqlTransaction = null;
+            using NpgsqlConnection conn = new NpgsqlConnection(connStr);
+            NpgsqlTransaction _sqlTransaction = null;
             try
             {
                 conn.Open();
@@ -89,7 +89,7 @@ namespace hotelier_core_app.Domain.Executers
                 _sqlTransaction.Commit();
                 return result;
             }
-            catch (SqlException)
+            catch (PostgresException)
             {
                 if (_sqlTransaction?.Connection != null)
                 {
@@ -111,8 +111,8 @@ namespace hotelier_core_app.Domain.Executers
 
         public dynamic ExecuteCommand<T>(string connStr, string query, object param)
         {
-            using SqlConnection sqlConnection = new SqlConnection(connStr);
-            SqlTransaction sqlTransaction = null;
+            using NpgsqlConnection sqlConnection = new NpgsqlConnection(connStr);
+            NpgsqlTransaction sqlTransaction = null;
             try
             {
                 sqlConnection.Open();
@@ -121,7 +121,7 @@ namespace hotelier_core_app.Domain.Executers
                 sqlTransaction.Commit();
                 return result;
             }
-            catch (SqlException)
+            catch (PostgresException)
             {
                 if (sqlTransaction?.Connection != null)
                 {
@@ -143,8 +143,8 @@ namespace hotelier_core_app.Domain.Executers
 
         public async Task<dynamic> ExecuteCommandAsync<T>(string connStr, string query, object param)
         {
-            using SqlConnection conn = new SqlConnection(connStr);
-            SqlTransaction _sqlTransaction = null;
+            using NpgsqlConnection conn = new NpgsqlConnection(connStr);
+            NpgsqlTransaction _sqlTransaction = null;
             try
             {
                 conn.Open();
@@ -153,7 +153,7 @@ namespace hotelier_core_app.Domain.Executers
                 _sqlTransaction.Commit();
                 return result;
             }
-            catch (SqlException)
+            catch (PostgresException)
             {
                 if (_sqlTransaction?.Connection != null)
                 {
@@ -173,16 +173,16 @@ namespace hotelier_core_app.Domain.Executers
             }
         }
 
-        public IEnumerable<T> ExecuteReader<T>(string connStr, Func<SqlConnection, SqlTransaction, IEnumerable<T>> task)
+        public IEnumerable<T> ExecuteReader<T>(string connStr, Func<NpgsqlConnection, NpgsqlTransaction, IEnumerable<T>> task)
         {
-            using SqlConnection sqlConnection = new SqlConnection(connStr);
-            SqlTransaction arg = null;
+            using NpgsqlConnection sqlConnection = new NpgsqlConnection(connStr);
+            NpgsqlTransaction arg = null;
             try
             {
                 sqlConnection.Open();
                 return task(sqlConnection, arg);
             }
-            catch (SqlException)
+            catch (PostgresException)
             {
                 throw;
             }
@@ -192,16 +192,16 @@ namespace hotelier_core_app.Domain.Executers
             }
         }
 
-        public async Task<IEnumerable<T>> ExecuteReaderAsync<T>(string connStr, Func<SqlConnection, SqlTransaction, Task<IEnumerable<T>>> task)
+        public async Task<IEnumerable<T>> ExecuteReaderAsync<T>(string connStr, Func<NpgsqlConnection, NpgsqlTransaction, Task<IEnumerable<T>>> task)
         {
-            using SqlConnection conn = new SqlConnection(connStr);
-            SqlTransaction arg = null;
+            using NpgsqlConnection conn = new NpgsqlConnection(connStr);
+            NpgsqlTransaction arg = null;
             try
             {
                 conn.Open();
                 return await task(conn, arg);
             }
-            catch (SqlException)
+            catch (PostgresException)
             {
                 throw;
             }
@@ -213,13 +213,13 @@ namespace hotelier_core_app.Domain.Executers
 
         public IEnumerable<T> ExecuteReader<T>(string connStr, string query, object param)
         {
-            using SqlConnection sqlConnection = new SqlConnection(connStr);
+            using NpgsqlConnection sqlConnection = new NpgsqlConnection(connStr);
             try
             {
                 sqlConnection.Open();
                 return sqlConnection.Query<T>(query, param, null, buffered: true, _configuration.GetValue<int>("AppSettings:DatabaseReadTimeout"));
             }
-            catch (SqlException)
+            catch (PostgresException)
             {
                 throw;
             }
@@ -231,13 +231,13 @@ namespace hotelier_core_app.Domain.Executers
 
         public async Task<IEnumerable<T>> ExecuteReaderAsync<T>(string connStr, string query, object param)
         {
-            using SqlConnection conn = new SqlConnection(connStr);
+            using NpgsqlConnection conn = new NpgsqlConnection(connStr);
             try
             {
                 conn.Open();
                 return await conn.QueryAsync<T>(query, param, null, _configuration.GetValue<int>("AppSettings:DatabaseReadTimeout"));
             }
-            catch (SqlException)
+            catch (PostgresException)
             {
                 throw;
             }
@@ -249,13 +249,13 @@ namespace hotelier_core_app.Domain.Executers
 
         public async Task<IEnumerable<T>> ExecuteReaderWithIncludeAsync<T, T1>(string connStr, string query, Func<T, T1, T> map, object param)
         {
-            using SqlConnection conn = new SqlConnection(connStr);
+            using NpgsqlConnection conn = new NpgsqlConnection(connStr);
             try
             {
                 conn.Open();
                 return await conn.QueryAsync(query, map, param, null, buffered: true, "Id", _configuration.GetValue<int>("AppSettings:DatabaseReadTimeout"));
             }
-            catch (SqlException)
+            catch (PostgresException)
             {
                 throw;
             }
@@ -267,13 +267,13 @@ namespace hotelier_core_app.Domain.Executers
 
         public async Task<IEnumerable<T>> ExecuteReaderAsync<T, T2>(string connStr, string query, object param)
         {
-            using SqlConnection conn = new SqlConnection(connStr);
+            using NpgsqlConnection conn = new NpgsqlConnection(connStr);
             try
             {
                 conn.Open();
                 return await conn.QueryAsync<T>(query, param, null, _configuration.GetValue<int>("AppSettings:DatabaseReadTimeout"));
             }
-            catch (SqlException)
+            catch (PostgresException)
             {
                 throw;
             }
@@ -285,13 +285,13 @@ namespace hotelier_core_app.Domain.Executers
 
         public async Task<T> ExecuteSingleReaderAsync<T>(string connStr, string query, object param)
         {
-            using SqlConnection conn = new SqlConnection(connStr);
+            using NpgsqlConnection conn = new NpgsqlConnection(connStr);
             try
             {
                 conn.Open();
                 return await conn.QueryFirstOrDefaultAsync<T>(query, param, null, _configuration.GetValue<int>("AppSettings:DatabaseReadTimeout"));
             }
-            catch (SqlException)
+            catch (PostgresException)
             {
                 throw;
             }
@@ -301,7 +301,7 @@ namespace hotelier_core_app.Domain.Executers
             }
         }
 
-        public dynamic ExecuteCommand<T>(string query, object param, SqlTransaction sqlTransaction)
+        public dynamic ExecuteCommand<T>(string query, object param, NpgsqlTransaction sqlTransaction)
         {
             if (sqlTransaction == null)
             {
@@ -312,7 +312,7 @@ namespace hotelier_core_app.Domain.Executers
             {
                 return sqlTransaction.Connection.Execute(query, param, sqlTransaction);
             }
-            catch (SqlException)
+            catch (PostgresException)
             {
                 sqlTransaction?.Rollback();
                 throw;
@@ -324,7 +324,7 @@ namespace hotelier_core_app.Domain.Executers
             }
         }
 
-        public async Task<dynamic> ExecuteCommandAsync<T>(string query, object param, SqlTransaction sqlTransaction)
+        public async Task<dynamic> ExecuteCommandAsync<T>(string query, object param, NpgsqlTransaction sqlTransaction)
         {
             if (sqlTransaction == null)
             {
@@ -335,7 +335,7 @@ namespace hotelier_core_app.Domain.Executers
             {
                 return await sqlTransaction.Connection.ExecuteAsync(query, param, sqlTransaction);
             }
-            catch (SqlException)
+            catch (PostgresException)
             {
                 sqlTransaction?.Rollback();
                 throw;

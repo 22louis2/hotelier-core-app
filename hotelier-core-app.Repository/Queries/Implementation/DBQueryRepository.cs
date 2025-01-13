@@ -9,19 +9,31 @@ namespace hotelier_core_app.Domain.Queries.Implementation
 
     public class DBQueryRepository<TEntity> : IDBQueryRepository<TEntity>, IBaseQueryRepository<TEntity> where TEntity : class
     {
-        private readonly IDBQueryRepository<TEntity> _queryRepository;
+        private readonly IIndex<DBProvider, IDBQueryRepository<TEntity>> _queryRepositories;
+        private IDBQueryRepository<TEntity> _queryRepository;
 
         private readonly IConfiguration _configuration;
 
-        public DBQueryRepository(IIndex<DBProvider, IDBQueryRepository<TEntity>> queryRepository, IConfiguration configuration)
+        public DBQueryRepository(IIndex<DBProvider, IDBQueryRepository<TEntity>> queryRepositories, IConfiguration configuration)
         {
             _configuration = configuration;
+            _queryRepositories = queryRepositories;
             if (!Enum.TryParse<DBProvider>(_configuration.GetValue<string>("AppSettings:OrmType"), ignoreCase: true, out var result))
             {
-                result = DBProvider.SQL_Dapper;
+                result = DBProvider.SQL_EFCore;
             }
 
-            _queryRepository = queryRepository[result];
+            _queryRepository = queryRepositories[result];
+        }
+
+        public void SwitchProvider(DBProvider provider)
+        {
+            if (!_queryRepositories.TryGetValue(provider, out var newRepository))
+            {
+                throw new InvalidOperationException($"Provider {provider} is not registered.");
+            }
+
+            _queryRepository = newRepository;
         }
 
         public TEntity Find(object id, string connectionString)
@@ -51,7 +63,7 @@ namespace hotelier_core_app.Domain.Queries.Implementation
 
         public IEnumerable<TEntity> GetAll()
         {
-            throw new NotImplementedException();
+            return _queryRepository.GetAll();
         }
 
         public Task<IEnumerable<TEntity>> GetAllAsync(string connectionString)
@@ -71,7 +83,7 @@ namespace hotelier_core_app.Domain.Queries.Implementation
 
         public IEnumerable<TEntity> GetBy(Expression<Func<TEntity, bool>> predicate)
         {
-            throw new NotImplementedException();
+            return _queryRepository.GetBy(predicate);
         }
 
         public Task<IEnumerable<TEntity>> GetByAsync(Expression<Func<TEntity, bool>> predicate, string connectionString)
@@ -131,7 +143,7 @@ namespace hotelier_core_app.Domain.Queries.Implementation
 
         public bool IsExist(Expression<Func<TEntity, bool>> predicate)
         {
-            throw new NotImplementedException();
+            return _queryRepository.IsExist(predicate);
         }
 
         public Task<bool> IsExistAsync(Expression<Func<TEntity, bool>> predicate, string connectionString)
@@ -157,6 +169,71 @@ namespace hotelier_core_app.Domain.Queries.Implementation
         public async Task<int> GetNextValueInSequenceAsync(string sequenceName, string connectionString)
         {
             return await _queryRepository.GetNextValueInSequenceAsync(sequenceName, connectionString);
+        }
+
+        public IQueryable<TEntity> GetAllQueryable()
+        {
+            return _queryRepository.GetAllQueryable();
+        }
+
+        public IQueryable<TEntity> GetAllTrackEntity()
+        {
+            return _queryRepository.GetAllTrackEntity();
+        }
+
+        public TEntity? GetByDefaultAsNoTracking(Expression<Func<TEntity, bool>> predicate)
+        {
+            return _queryRepository.GetByDefaultAsNoTracking(predicate);
+        }
+
+        public async Task<TEntity?> GetByDefaultAsNoTrackingAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _queryRepository.GetByDefaultAsNoTrackingAsync(predicate);
+        }
+
+        public TEntity? GetByDefaultIncluding(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
+        {
+            return _queryRepository.GetByDefaultIncluding(predicate, includeProperties);
+        }
+
+        public IQueryable<TEntity> GetAllIncluding(params Expression<Func<TEntity, object>>[] includeProperties)
+        {
+            return _queryRepository.GetAllIncluding(includeProperties);
+        }
+
+        public IEnumerable<TEntity> AllInclude(params Expression<Func<TEntity, object>>[] includeProperties)
+        {
+            return _queryRepository.AllInclude(includeProperties);
+        }
+
+        public IEnumerable<TEntity> FindByInclude(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
+        {
+            return _queryRepository.FindByInclude(predicate, includeProperties);
+        }
+
+        public IQueryable<TEntity> GetByAllIncluding(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
+        {
+            return _queryRepository.GetByAllIncluding(predicate, includeProperties);
+        }
+
+        public TEntity? FindWithChildInclude(Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>, IQueryable<TEntity>> includeMembers)
+        {
+            return _queryRepository.FindWithChildInclude(predicate, includeMembers);
+        }
+
+        public IQueryable<TEntity> GetAllByWithChildInclude(Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>, IQueryable<TEntity>> includeMembers)
+        {
+            return _queryRepository.GetAllByWithChildInclude(predicate, includeMembers);
+        }
+
+        public IQueryable<TEntity> GetAllWithChildInclude(Func<IQueryable<TEntity>, IQueryable<TEntity>> includeMembers)
+        {
+            return _queryRepository.GetAllWithChildInclude(includeMembers);
+        }
+
+        public IQueryable<TEntity> GetRecordUsingStoredProcedure(string storedProcedure, object[] parameter)
+        {
+            return _queryRepository.GetRecordUsingStoredProcedure(storedProcedure, parameter);
         }
     }
 }

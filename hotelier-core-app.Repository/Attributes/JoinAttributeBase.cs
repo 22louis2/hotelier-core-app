@@ -20,7 +20,7 @@
 
         protected JoinAttributeBase(string tableName, string key, string externalKey, string tableSchema, string tableAlias, string attrString = "JOIN")
         {
-            TableName = "dbo." + tableName;
+            TableName = "public.\"" + tableName + "\""; ;
             Key = key;
             ExternalKey = externalKey;
             TableSchema = tableSchema;

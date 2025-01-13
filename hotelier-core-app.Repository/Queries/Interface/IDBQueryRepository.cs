@@ -1,9 +1,11 @@
-﻿using System.Linq.Expressions;
+﻿using hotelier_core_app.Domain.Helpers;
+using System.Linq.Expressions;
 
 namespace hotelier_core_app.Domain.Queries.Interface
 {
     public interface IDBQueryRepository<TEntity> : IBaseQueryRepository<TEntity> where TEntity : class
     {
+        void SwitchProvider(DBProvider provider);
         TEntity Find(object id, string connectionString);
 
         Task<TEntity> FindAsync(object id, string connectionString);

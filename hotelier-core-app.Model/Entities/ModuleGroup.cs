@@ -18,7 +18,7 @@ namespace hotelier_core_app.Model.Entities
         [StringLength(500)]
         public string Description { get; set; }
         [StringLength(500)]
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
         [StringLength(200)]
         public string CreatedBy { get; set; }

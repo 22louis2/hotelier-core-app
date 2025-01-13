@@ -2,6 +2,7 @@
 using hotelier_core_app.Core.Constants;
 using hotelier_core_app.Core.Enums;
 using hotelier_core_app.Domain.Commands.Interface;
+using hotelier_core_app.Domain.Helpers;
 using hotelier_core_app.Model.DTOs.Request;
 using hotelier_core_app.Model.DTOs.Response;
 using hotelier_core_app.Model.Entities;
@@ -25,6 +26,8 @@ namespace hotelier_core_app.Service.Implementation
         private readonly IEmailService _emailService;
         private readonly IMapper _mapper;
         private readonly string _clientUrl;
+        private const string HOTELIER_ADMIN = "Hotelier Admin";
+        private const string HOTELIER_ADMIN_EMAIL = "admin@hotelier.com";
 
         public UserService(
             UserManager<ApplicationUser> userManager, 
@@ -105,20 +108,20 @@ namespace hotelier_core_app.Service.Implementation
 
             ApplicationUser newUser = _mapper.Map<ApplicationUser>(model);
             newUser.CreationDate = DateTime.UtcNow;
-            newUser.CreatedBy = auditLog.PerformedBy;
+            newUser.CreatedBy = HOTELIER_ADMIN;
+
             IdentityResult newUserResult = await _userManager.CreateAsync(newUser, model.Password);
 
-            if (newUserResult != null)
+            if (!newUserResult.Succeeded)
             {
                 return HandleIdentityErrors(newUserResult);
             }
 
-          
             if (!await _roleManager.RoleExistsAsync(model.Role.ToString()))
             {
                 ApplicationRole newRole = _mapper.Map<ApplicationRole>(model);
                 newRole.CreationDate = DateTime.UtcNow;
-                newRole.CreatedBy = auditLog.PerformedBy;
+                newRole.CreatedBy = HOTELIER_ADMIN;
                 await _roleManager.CreateAsync(newRole);
             }
 
@@ -133,9 +136,12 @@ namespace hotelier_core_app.Service.Implementation
             catch (Exception ex)
             {
                 await _userManager.DeleteAsync(newUser);
-                return BaseResponse.Failure(ex.Message, ResponseStatusCode.OperationFailed);
+                return BaseResponse.Failure(ex.Message, ResponseStatusCode.SQlException);
             }
 
+            auditLog.PerformedBy = HOTELIER_ADMIN;
+            auditLog.PerformerEmail = HOTELIER_ADMIN_EMAIL;
+            _auditLogCommandRepository.SwitchProvider(DBProvider.SQL_Dapper);
             await _auditLogCommandRepository.AddAsync(auditLog);
 
             await SendEmailConfirmationAsync(newUser, model.Email);
@@ -310,6 +316,7 @@ namespace hotelier_core_app.Service.Implementation
             tenant.Users.Add(newUser);
 
             await _tenantCommandRepository.AddAsync(tenant);
+            await _tenantCommandRepository.SaveAsync();
         }
 
         private BaseResponse HandleIdentityErrors(IdentityResult result)

@@ -12,21 +12,22 @@ namespace hotelier_core_app.Migrations.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("CREATE EXTENSION IF NOT EXISTS pgcrypto;");
             migrationBuilder.CreateTable(
                 name: "AuditLog",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Devicetype = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    IpAddress = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    MacAddress = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    Devicetype = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    IpAddress = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    MacAddress = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     Latitude = table.Column<decimal>(type: "numeric", nullable: false),
                     Longitude = table.Column<decimal>(type: "numeric", nullable: false),
-                    Location = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    Location = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     PerformedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     PerformerEmail = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    PerformedAgainst = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    PerformedAgainst = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     Action = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     DatePerformed = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -43,7 +44,7 @@ namespace hotelier_core_app.Migrations.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    Url = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    Url = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     CreatedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     ModifiedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -62,7 +63,7 @@ namespace hotelier_core_app.Migrations.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CreatedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    ModifiedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    ModifiedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     LastModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
@@ -91,39 +92,23 @@ namespace hotelier_core_app.Migrations.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "User",
+                name: "Tenants",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: false),
-                    FullName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    Status = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    SubscriptionPlan = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     CreatedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    ModifiedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    ModifiedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     LastModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    RefreshToken = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    UserName = table.Column<string>(type: "text", nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "text", nullable: true),
-                    Email = table.Column<string>(type: "text", nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "text", nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    PasswordHash = table.Column<string>(type: "text", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User", x => x.Id);
+                    table.PrimaryKey("PK_Tenants", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -180,7 +165,7 @@ namespace hotelier_core_app.Migrations.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CreatedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    ModifiedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    ModifiedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     LastModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
@@ -198,22 +183,58 @@ namespace hotelier_core_app.Migrations.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserRole",
+                name: "User",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: false, defaultValueSql: "gen_random_bytes(8)"),
+                    FullName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Status = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     CreatedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    ModifiedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    ModifiedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     LastModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    Picture = table.Column<string>(type: "text", nullable: true),
+                    RefreshToken = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    TenantId = table.Column<long>(type: "bigint", nullable: true),
+                    UserName = table.Column<string>(type: "text", nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "text", nullable: true),
+                    Email = table.Column<string>(type: "text", nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "text", nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_User", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_User_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalTable: "Tenants",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserRole",
+                columns: table => new
+                {
                     UserId = table.Column<long>(type: "bigint", nullable: false),
                     RoleId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserRole", x => x.Id);
+                    table.PrimaryKey("PK_UserRole", x => new { x.UserId, x.RoleId });
                     table.ForeignKey(
                         name: "FK_UserRole_Role_RoleId",
                         column: x => x.RoleId,
@@ -234,6 +255,11 @@ namespace hotelier_core_app.Migrations.Migrations
                 column: "ModuleGroupId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_User_TenantId",
+                table: "User",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserRole_RoleId",
                 table: "UserRole",
                 column: "RoleId");
@@ -248,6 +274,7 @@ namespace hotelier_core_app.Migrations.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("DROP EXTENSION IF EXISTS pgcrypto;");
             migrationBuilder.DropTable(
                 name: "AuditLog");
 
@@ -277,6 +304,9 @@ namespace hotelier_core_app.Migrations.Migrations
 
             migrationBuilder.DropTable(
                 name: "User");
+
+            migrationBuilder.DropTable(
+                name: "Tenants");
         }
     }
 }
