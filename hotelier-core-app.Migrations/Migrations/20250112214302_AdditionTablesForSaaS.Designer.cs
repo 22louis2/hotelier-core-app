@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using hotelier_core_app.Migrations;
@@ -11,9 +12,11 @@ using hotelier_core_app.Migrations;
 namespace hotelier_core_app.Migrations.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250112214302_AdditionTablesForSaaS")]
+    partial class AdditionTablesForSaaS
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -123,12 +126,7 @@ namespace hotelier_core_app.Migrations.Migrations
                     b.Property<string>("NormalizedName")
                         .HasColumnType("text");
 
-                    b.Property<long?>("TenantId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("Role");
                 });
@@ -990,15 +988,6 @@ namespace hotelier_core_app.Migrations.Migrations
                     b.ToTable("Tenant");
                 });
 
-            modelBuilder.Entity("hotelier_core_app.Model.Entities.ApplicationRole", b =>
-                {
-                    b.HasOne("hotelier_core_app.Model.Entities.Tenant", "Tenant")
-                        .WithMany("Roles")
-                        .HasForeignKey("TenantId");
-
-                    b.Navigation("Tenant");
-                });
-
             modelBuilder.Entity("hotelier_core_app.Model.Entities.ApplicationUser", b =>
                 {
                     b.HasOne("hotelier_core_app.Model.Entities.Tenant", "Tenant")
@@ -1208,8 +1197,6 @@ namespace hotelier_core_app.Migrations.Migrations
             modelBuilder.Entity("hotelier_core_app.Model.Entities.Tenant", b =>
                 {
                     b.Navigation("Properties");
-
-                    b.Navigation("Roles");
 
                     b.Navigation("Users");
                 });

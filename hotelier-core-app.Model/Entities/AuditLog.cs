@@ -12,23 +12,23 @@ namespace hotelier_core_app.Model.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
-        [StringLength(500)]
+        [StringLength(200)]
         public string? Devicetype { get; set; }
-        [StringLength(500)]
+        [StringLength(200)]
         public string? IpAddress { get; set; }
-        [StringLength(500)]
+        [StringLength(200)]
         public string? MacAddress { get; set; }
         public decimal Latitude { get; set; }
         public decimal Longitude { get; set; }
         [StringLength(500)]
         public string? Location { get; set; }
-        [StringLength(500)]
+        [StringLength(200)]
         public string PerformedBy { get; set; }
-        [StringLength(500)]
+        [StringLength(200)]
         public string PerformerEmail { get; set; }
-        [StringLength(500)]
+        [StringLength(255)]
         public string? PerformedAgainst { get; set; }
-        [StringLength(500)]
+        [StringLength(200)]
         public string Action { get; set; }
         public DateTime DatePerformed { get; set; }
 

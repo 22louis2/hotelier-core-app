@@ -5,41 +5,41 @@ using hotelier_core_app.Model.Attributes;
 
 namespace hotelier_core_app.Model.Entities
 {
-    [Table("Tenant")]
-    [TableName("Tenant")]
+    [Table("Property")]
+    [TableName("Property")]
     [Serializable]
-    public class Tenant : IBaseEntity
+    public class Property : IBaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
-        [StringLength(200)]
-        public string Name { get; set; }
-
         [StringLength(255)]
-        public string Logo { get; set; }
+        public string Name { get; set; }
 
         [StringLength(500)]
         public string Description { get; set; }
 
-        [StringLength(50)]
-        public string SubscriptionPlan { get; set; } 
-        public DateTime? SubscriptionStartDate { get; set; }
-        public DateTime? SubscriptionEndDate { get; set; }
+        [StringLength(255)]
+        public string? Image { get; set; }
 
         [StringLength(200)]
         public string CreatedBy { get; set; }
 
         [StringLength(200)]
         public string? ModifiedBy { get; set; }
-
         public DateTime CreationDate { get; set; }
         public DateTime? LastModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
 
-        public ICollection<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
-        public ICollection<ApplicationRole> Roles { get; set; } = new List<ApplicationRole>();
-        public ICollection<Property> Properties { get; set; } = new List<Property>();
+        [ForeignKey("Tenant")]
+        public long TenantId { get; set; }
+        public Tenant Tenant { get; set; }
+
+        [ForeignKey("Address")]
+        public long AddressId { get; set; }
+        public Address Address { get; set; }
+
+        public ICollection<Room> Rooms { get; set; } = new List<Room>();
     }
 }
