@@ -1,10 +1,10 @@
 ﻿using hotelier_core_app.Model.Interfaces;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace hotelier_core_app.Model.Entities
 {
-    public class Tenant : IBaseEntity
+    public class Property : IBaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -17,7 +17,11 @@ namespace hotelier_core_app.Model.Entities
         public string Description { get; set; }
 
         [StringLength(255)]
-        public string SubscriptionPlan { get; set; } // Basic, Standard, Premium 
+        public string Image { get; set; }
+
+        public long TenantId { get; set; }
+
+        public long AddressId { get; set; }
 
         [StringLength(200)]
         public string CreatedBy { get; set; }
@@ -26,12 +30,15 @@ namespace hotelier_core_app.Model.Entities
         public string? ModifiedBy { get; set; }
 
         public DateTime? CreationDate { get; set; }
+
         public DateTime? LastModifiedDate { get; set; }
+
         public bool IsDeleted { get; set; }
 
-        public ICollection<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
+        public Tenant Tenant { get; set; }
+        public Address Address { get; set; }
 
-        public ICollection<Property> Properties { get; set; }
+        public ICollection<Room> Rooms { get; set; }
 
         public ICollection<Discount> Discounts { get; set; }
     }
