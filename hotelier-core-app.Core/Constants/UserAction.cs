@@ -20,5 +20,7 @@
         public const string CreateModule = "Create Module";
         public const string EditModule = "Edit Module";
 
+        // Property Management
+        public const string AddProperty = "Add Property";
     }
 }

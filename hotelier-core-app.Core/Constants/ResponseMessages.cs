@@ -59,5 +59,10 @@
 
         public const string InvalidCredential = "Invalid Credentials";
         public const string UserEmailNotConfirmed = "User's email has not been confirmed";
+
+        // Property Management
+        public const string TenantNotExisting = "Tenant does not exist";
+        public const string UserNotInTenant = "The user does not belong to the tenant specified";
+        public const string PropertyNotFound = "PropertyNotFound";
     }
 }

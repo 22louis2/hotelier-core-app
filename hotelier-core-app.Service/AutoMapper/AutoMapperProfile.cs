@@ -27,6 +27,9 @@ namespace hotelier_core_app.Service.AutoMapper
             CreateMap<ModuleGroup, ModuleGroupDTO>();
             CreateMap<Module, ModuleDTO>();
             CreateMap<ApplicationRole, RoleDTO>();
+
+            CreateMap<AddPropertyRequestDTO, Property>();
+            CreateMap<CreateAddressRequestDTO, Address>();
         }
     }
 }
