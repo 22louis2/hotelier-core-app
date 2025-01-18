@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using hotelier_core_app.Core.Constants;
+using hotelier_core_app.Core.Helpers.Interface;
 using hotelier_core_app.Domain.Commands.Interface;
 using hotelier_core_app.Domain.Queries.Interface;
 using hotelier_core_app.Model.DTOs.Request;
@@ -20,6 +21,7 @@ namespace hotelier_core_app.Service.Implementation
         private readonly IDBCommandRepository<AuditLog> _auditLogCommandRepository;
         private readonly IDBQueryRepository<Property> _propertyQueryRepository;
         private readonly IDBQueryRepository<Address> _addressQueryRepository;
+        private readonly IUtility _utility;
 
         public PropertyService(IDBQueryRepository<Tenant> tenantQueryRepository,
             UserManager<ApplicationUser> userManager,
@@ -28,7 +30,8 @@ namespace hotelier_core_app.Service.Implementation
             IDBCommandRepository<Property> propertyCommandRepository,
             IDBCommandRepository<AuditLog> auditLogCommandRepository,
             IDBQueryRepository<Property> propertyQueryRepository,
-            IDBQueryRepository<Address> addressQueryRepository)
+            IDBQueryRepository<Address> addressQueryRepository,
+            IUtility utility)
         {
             _tenantQueryRepository = tenantQueryRepository;
             _userManager = userManager;
@@ -38,6 +41,7 @@ namespace hotelier_core_app.Service.Implementation
             _auditLogCommandRepository = auditLogCommandRepository;
             _propertyQueryRepository = propertyQueryRepository;
             _addressQueryRepository = addressQueryRepository;
+            _utility = utility;
         }
 
         // add property
@@ -96,14 +100,22 @@ namespace hotelier_core_app.Service.Implementation
             return BaseResponse.Success();
         }
 
-        //public async Task<PageBaseResponse<Property>> GetPropertyList()
-        //{
+        public async Task<BaseResponse<PropertyResponseDTO>> GetById(long id)
+        {
+            var property = _propertyQueryRepository.FindByInclude(p => p.Id == id, p => p.Address);
+            if (property == null) return BaseResponse<PropertyResponseDTO>.Failure(new PropertyResponseDTO(), ResponseMessages.PropertyNotFound);
 
-        //}
+            var response = _mapper.Map<PropertyResponseDTO>(property);
+            return BaseResponse<PropertyResponseDTO>.Success(response);
+        }
 
-        //public async Task<BaseResponse<Property>> GetById(long id)
-        //{
+        public async Task<PageBaseResponse<List<PropertyResponseDTO>>> GetTenantPropertyList(GetPropertiesInputDTO input)
+        {
+            var properties = await _propertyQueryRepository.GetByAsync(p => p.TenantId == input.TenantId);
+            var paginated = _utility.Paginate(properties, input.PageNumber, input.PageSize);
+            var response = _mapper.Map<List<PropertyResponseDTO>>(paginated);
 
-        //}
+            return PageBaseResponse<List<PropertyResponseDTO>>.Success(response, count: response.Count(), totalPageCount: properties.Count(), pageSize: input.PageSize, pageNumber: input.PageNumber);
+        }
     }
 }

@@ -29,7 +29,7 @@ namespace hotelier_core_app.API.Controllers
         }
 
         // add permission authorization
-        [HttpPost("properties")]
+        [HttpPost()]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ValidationResultModel))]
@@ -51,7 +51,7 @@ namespace hotelier_core_app.API.Controllers
         }
 
         // add permission authorization
-        [HttpPut("properties")]
+        [HttpPut()]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ValidationResultModel))]
@@ -69,6 +69,24 @@ namespace hotelier_core_app.API.Controllers
             };
 
             var response = await _propertyService.UpdateProperty(request, auditLog);
+            return Ok(response);
+        }
+
+        [HttpGet("{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
+        public async Task<IActionResult> GetProperty(long id)
+        {
+            var response = await _propertyService.GetById(id);
+            return Ok(response);
+        }
+
+        [HttpGet("")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
+        public async Task<IActionResult> GetTenantProperties(GetPropertiesInputDTO input)
+        {
+            var response = await _propertyService.GetTenantPropertyList(input);
             return Ok(response);
         }
     }

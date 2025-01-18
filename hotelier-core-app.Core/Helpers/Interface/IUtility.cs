@@ -16,5 +16,7 @@ namespace hotelier_core_app.Core.Helpers.Interface
         Task<HttpResponseMessage?> MakeHttpFormRequestWithMultipleFiles(List<KeyValuePair<string, object>> request, string baseAddress, string requestUri, HttpMethod method, Dictionary<string, string> headers = null);
 
         IFormFile ConvertToFormFile(MemoryStream stream, string fileName, string contentType);
+
+        List<T> Paginate<T>(IEnumerable<T> items, int pageNumber, int pageSize) where T : class;
     }
 }

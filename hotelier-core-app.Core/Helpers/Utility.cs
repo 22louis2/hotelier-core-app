@@ -245,6 +245,14 @@ namespace hotelier_core_app.Core.Helpers
             string stringHash = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
             return stringHash;
         }
+
+        public List<T> Paginate<T>(IEnumerable<T> items, int pageNumber, int pageSize) where T : class
+        {
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10;
+
+            return items.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+        }
         #endregion
 
         #region private

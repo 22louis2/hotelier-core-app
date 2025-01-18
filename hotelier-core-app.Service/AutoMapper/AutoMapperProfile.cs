@@ -30,6 +30,8 @@ namespace hotelier_core_app.Service.AutoMapper
 
             CreateMap<AddPropertyRequestDTO, Property>();
             CreateMap<CreateAddressRequestDTO, Address>();
+            CreateMap<Address, AddressResponseDTO>();
+            CreateMap<Property, PropertyResponseDTO>();
         }
     }
 }

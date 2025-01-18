@@ -4,15 +4,11 @@ using hotelier_core_app.Model.Entities;
 
 namespace hotelier_core_app.Service.Interface
 {
-    public interface IPropertyService
+    public interface IPropertyService : IAutoDependencyService
     {
-        // add
-        // edit
-        // delete
-        // get
-        // get list
-
         Task<BaseResponse> AddProperty(AddPropertyRequestDTO request, AuditLog auditLog);
         Task<BaseResponse> UpdateProperty(UpdatePropertyRequestDTO request, AuditLog auditLog);
+        Task<BaseResponse<PropertyResponseDTO>> GetById(long id);
+        Task<PageBaseResponse<List<PropertyResponseDTO>>> GetTenantPropertyList(GetPropertiesInputDTO input);
     }
 }
