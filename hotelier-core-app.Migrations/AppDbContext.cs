@@ -11,6 +11,13 @@ namespace hotelier_core_app.Migrations
         public DbSet<Module> Modules { get; set; }
         public DbSet<ModuleGroup> ModuleGroups { get; set; }
         public DbSet<Tenant> Tenants { get; set; }
+        public DbSet<Property> Properties { get; set; }
+        public DbSet<Room> Rooms { get; set; }
+        public DbSet<Discount> Discounts { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<ServiceRequest> ServiceRequests { get; set; }
+        public DbSet<Payment> Payments { get; set; }
+        public DbSet<Address> Addresses { get; set; }
 
         public AppDbContext()
         {
