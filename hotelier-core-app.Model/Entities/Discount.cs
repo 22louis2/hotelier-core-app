@@ -56,5 +56,6 @@ namespace hotelier_core_app.Model.Entities
         public Room Room { get; set; }
 
         public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>(); // Discounts linked to reservations
+        public ICollection<SubscriptionPlan> SubscriptionPlans { get; set; } = new List<SubscriptionPlan>(); // Discounts linked to subscription plans
     }
 }

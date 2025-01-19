@@ -6,6 +6,7 @@ namespace hotelier_core_app.Model.DTOs.Request
     public class CreateUserRequestDTO : UserRequestDTO
     {
         public string HotelName { get; set; }
+        public int SubscriptionPlanId { get; set; }
     }
 
     public class UserRequestDTO

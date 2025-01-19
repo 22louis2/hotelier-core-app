@@ -40,6 +40,7 @@ namespace hotelier_core_app.Model.Entities
         [ForeignKey("Tenant")]
         public long? TenantId { get; set; }
         public Tenant Tenant { get; set; }
+        public ICollection<ApplicationUserPolicyGroup> UserPolicyGroups { get; set; } = new List<ApplicationUserPolicyGroup>();
 
         public ApplicationUser()
         {

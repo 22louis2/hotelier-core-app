@@ -12,8 +12,8 @@ using hotelier_core_app.Migrations;
 namespace hotelier_core_app.Migrations.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250114033156_UpdatedTenantRoleCreationtable")]
-    partial class UpdatedTenantRoleCreationtable
+    [Migration("20250119204554_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -288,6 +288,47 @@ namespace hotelier_core_app.Migrations.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserLogin");
+                });
+
+            modelBuilder.Entity("hotelier_core_app.Model.Entities.ApplicationUserPolicyGroup", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<long>("PolicyGroupId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PolicyGroupId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserPolicyGroup");
                 });
 
             modelBuilder.Entity("hotelier_core_app.Model.Entities.ApplicationUserRole", b =>
@@ -671,6 +712,98 @@ namespace hotelier_core_app.Migrations.Migrations
                     b.ToTable("Permission");
                 });
 
+            modelBuilder.Entity("hotelier_core_app.Model.Entities.PolicyGroup", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("PolicyGroup");
+                });
+
+            modelBuilder.Entity("hotelier_core_app.Model.Entities.PolicyModulePermission", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<long>("ModuleGroupId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PermissionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PolicyGroupId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ModuleGroupId");
+
+                    b.HasIndex("PermissionId");
+
+                    b.HasIndex("PolicyGroupId");
+
+                    b.ToTable("PolicyModulePermission");
+                });
+
             modelBuilder.Entity("hotelier_core_app.Model.Entities.Property", b =>
                 {
                     b.Property<long>("Id")
@@ -786,52 +919,6 @@ namespace hotelier_core_app.Migrations.Migrations
                     b.ToTable("Reservation");
                 });
 
-            modelBuilder.Entity("hotelier_core_app.Model.Entities.RolePermission", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("LastModifiedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<long>("ModuleGroupId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("PermissionId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("RoleId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ModuleGroupId");
-
-                    b.HasIndex("PermissionId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("RolePermission");
-                });
-
             modelBuilder.Entity("hotelier_core_app.Model.Entities.Room", b =>
                 {
                     b.Property<long>("Id")
@@ -936,6 +1023,61 @@ namespace hotelier_core_app.Migrations.Migrations
                     b.ToTable("ServiceRequest");
                 });
 
+            modelBuilder.Entity("hotelier_core_app.Model.Entities.SubscriptionPlan", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long?>("DiscountId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiscountId");
+
+                    b.ToTable("SubscriptionPlan");
+                });
+
             modelBuilder.Entity("hotelier_core_app.Model.Entities.Tenant", b =>
                 {
                     b.Property<long>("Id")
@@ -977,18 +1119,15 @@ namespace hotelier_core_app.Migrations.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<DateTime?>("SubscriptionEndDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<long?>("SubscriptionPlanId")
+                        .HasColumnType("bigint");
 
-                    b.Property<string>("SubscriptionPlan")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<DateTime?>("SubscriptionStartDate")
+                    b.Property<DateTime?>("TrialStartDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SubscriptionPlanId");
 
                     b.ToTable("Tenant");
                 });
@@ -1009,6 +1148,25 @@ namespace hotelier_core_app.Migrations.Migrations
                         .HasForeignKey("TenantId");
 
                     b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("hotelier_core_app.Model.Entities.ApplicationUserPolicyGroup", b =>
+                {
+                    b.HasOne("hotelier_core_app.Model.Entities.PolicyGroup", "PolicyGroup")
+                        .WithMany("UserPolicyGroups")
+                        .HasForeignKey("PolicyGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("hotelier_core_app.Model.Entities.ApplicationUser", "User")
+                        .WithMany("UserPolicyGroups")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PolicyGroup");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("hotelier_core_app.Model.Entities.ApplicationUserRole", b =>
@@ -1084,6 +1242,44 @@ namespace hotelier_core_app.Migrations.Migrations
                     b.Navigation("Reservation");
                 });
 
+            modelBuilder.Entity("hotelier_core_app.Model.Entities.PolicyGroup", b =>
+                {
+                    b.HasOne("hotelier_core_app.Model.Entities.Tenant", "Tenant")
+                        .WithMany("PolicyGroups")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("hotelier_core_app.Model.Entities.PolicyModulePermission", b =>
+                {
+                    b.HasOne("hotelier_core_app.Model.Entities.ModuleGroup", "ModuleGroup")
+                        .WithMany()
+                        .HasForeignKey("ModuleGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("hotelier_core_app.Model.Entities.Permission", "Permission")
+                        .WithMany()
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("hotelier_core_app.Model.Entities.PolicyGroup", "PolicyGroup")
+                        .WithMany("ModulePermissions")
+                        .HasForeignKey("PolicyGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ModuleGroup");
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("PolicyGroup");
+                });
+
             modelBuilder.Entity("hotelier_core_app.Model.Entities.Property", b =>
                 {
                     b.HasOne("hotelier_core_app.Model.Entities.Address", "Address")
@@ -1128,33 +1324,6 @@ namespace hotelier_core_app.Migrations.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("hotelier_core_app.Model.Entities.RolePermission", b =>
-                {
-                    b.HasOne("hotelier_core_app.Model.Entities.ModuleGroup", "ModuleGroup")
-                        .WithMany()
-                        .HasForeignKey("ModuleGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("hotelier_core_app.Model.Entities.Permission", "Permission")
-                        .WithMany()
-                        .HasForeignKey("PermissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("hotelier_core_app.Model.Entities.ApplicationRole", "Role")
-                        .WithMany("RolePermissions")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ModuleGroup");
-
-                    b.Navigation("Permission");
-
-                    b.Navigation("Role");
-                });
-
             modelBuilder.Entity("hotelier_core_app.Model.Entities.Room", b =>
                 {
                     b.HasOne("hotelier_core_app.Model.Entities.Property", "Property")
@@ -1177,13 +1346,28 @@ namespace hotelier_core_app.Migrations.Migrations
                     b.Navigation("Reservation");
                 });
 
-            modelBuilder.Entity("hotelier_core_app.Model.Entities.ApplicationRole", b =>
+            modelBuilder.Entity("hotelier_core_app.Model.Entities.SubscriptionPlan", b =>
                 {
-                    b.Navigation("RolePermissions");
+                    b.HasOne("hotelier_core_app.Model.Entities.Discount", "Discount")
+                        .WithMany("SubscriptionPlans")
+                        .HasForeignKey("DiscountId");
+
+                    b.Navigation("Discount");
+                });
+
+            modelBuilder.Entity("hotelier_core_app.Model.Entities.Tenant", b =>
+                {
+                    b.HasOne("hotelier_core_app.Model.Entities.SubscriptionPlan", "SubscriptionPlan")
+                        .WithMany()
+                        .HasForeignKey("SubscriptionPlanId");
+
+                    b.Navigation("SubscriptionPlan");
                 });
 
             modelBuilder.Entity("hotelier_core_app.Model.Entities.ApplicationUser", b =>
                 {
+                    b.Navigation("UserPolicyGroups");
+
                     b.Navigation("UserRole")
                         .IsRequired();
                 });
@@ -1191,11 +1375,20 @@ namespace hotelier_core_app.Migrations.Migrations
             modelBuilder.Entity("hotelier_core_app.Model.Entities.Discount", b =>
                 {
                     b.Navigation("Reservations");
+
+                    b.Navigation("SubscriptionPlans");
                 });
 
             modelBuilder.Entity("hotelier_core_app.Model.Entities.ModuleGroup", b =>
                 {
                     b.Navigation("Modules");
+                });
+
+            modelBuilder.Entity("hotelier_core_app.Model.Entities.PolicyGroup", b =>
+                {
+                    b.Navigation("ModulePermissions");
+
+                    b.Navigation("UserPolicyGroups");
                 });
 
             modelBuilder.Entity("hotelier_core_app.Model.Entities.Property", b =>
@@ -1210,6 +1403,8 @@ namespace hotelier_core_app.Migrations.Migrations
 
             modelBuilder.Entity("hotelier_core_app.Model.Entities.Tenant", b =>
                 {
+                    b.Navigation("PolicyGroups");
+
                     b.Navigation("Properties");
 
                     b.Navigation("Roles");

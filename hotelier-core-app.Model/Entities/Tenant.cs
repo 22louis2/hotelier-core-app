@@ -22,11 +22,7 @@ namespace hotelier_core_app.Model.Entities
 
         [StringLength(500)]
         public string Description { get; set; }
-
-        [StringLength(50)]
-        public string SubscriptionPlan { get; set; } 
-        public DateTime? SubscriptionStartDate { get; set; }
-        public DateTime? SubscriptionEndDate { get; set; }
+        public DateTime? TrialStartDate { get; set; }
 
         [StringLength(200)]
         public string CreatedBy { get; set; }
@@ -38,8 +34,12 @@ namespace hotelier_core_app.Model.Entities
         public DateTime? LastModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
 
+        [ForeignKey("SubscriptionPlan")]
+        public long? SubscriptionPlanId { get; set; }
+        public SubscriptionPlan SubscriptionPlan { get; set; }
         public ICollection<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
         public ICollection<ApplicationRole> Roles { get; set; } = new List<ApplicationRole>();
         public ICollection<Property> Properties { get; set; } = new List<Property>();
+        public ICollection<PolicyGroup> PolicyGroups { get; set; } = new List<PolicyGroup>();
     }
 }
