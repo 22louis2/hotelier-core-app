@@ -59,5 +59,7 @@
 
         public const string InvalidCredential = "Invalid Credentials";
         public const string UserEmailNotConfirmed = "User's email has not been confirmed";
+        
+        
     }
 }
