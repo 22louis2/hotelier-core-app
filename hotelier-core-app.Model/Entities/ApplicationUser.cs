@@ -26,7 +26,7 @@ namespace hotelier_core_app.Model.Entities
 
         [StringLength(200)]
         public string? ModifiedBy { get; set; }
-        public DateTime? CreationDate { get; set; }
+        public DateTime CreationDate { get; set; }
         public DateTime? LastModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
         public string? Picture {  get; set; }
@@ -40,6 +40,7 @@ namespace hotelier_core_app.Model.Entities
         [ForeignKey("Tenant")]
         public long? TenantId { get; set; }
         public Tenant Tenant { get; set; }
+        public ICollection<ApplicationUserPolicyGroup> UserPolicyGroups { get; set; } = new List<ApplicationUserPolicyGroup>();
 
         public ApplicationUser()
         {

@@ -5,10 +5,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace hotelier_core_app.Model.Entities
 {
-    [Table("Module")]
-    [TableName("Module")]
+    [Table("PolicyModulePermission")]
+    [TableName("PolicyModulePermission")]
     [Serializable]
-    public class Module : IBaseEntity
+    public class PolicyModulePermission : IBaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -23,12 +23,16 @@ namespace hotelier_core_app.Model.Entities
         public DateTime? LastModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
 
+        [ForeignKey("PolicyGroup")]
+        public long PolicyGroupId { get; set; }
+        public PolicyGroup PolicyGroup { get; set; }
 
-        [Range(1, Int64.MaxValue)]
+        [ForeignKey("ModuleGroup")]
         public long ModuleGroupId { get; set; }
-        [ForeignKey("ModuleGroupId")]
-        public required ModuleGroup ModuleGroup { get; set; }
+        public ModuleGroup ModuleGroup { get; set; }
 
-        public Module() { }
+        [ForeignKey("Permission")]
+        public long PermissionId { get; set; }
+        public Permission Permission { get; set; }
     }
 }

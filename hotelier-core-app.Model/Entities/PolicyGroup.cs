@@ -5,14 +5,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace hotelier_core_app.Model.Entities
 {
-    [Table("Module")]
-    [TableName("Module")]
+    [Table("PolicyGroup")]
+    [TableName("PolicyGroup")]
     [Serializable]
-    public class Module : IBaseEntity
+    public class PolicyGroup : IBaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
+
+        [StringLength(200)]
+        public string Name { get; set; }
+
+        [StringLength(500)]
+        public string Description { get; set; }
 
         [StringLength(200)]
         public string CreatedBy { get; set; }
@@ -23,12 +29,12 @@ namespace hotelier_core_app.Model.Entities
         public DateTime? LastModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
 
+        [ForeignKey("Tenant")]
+        public long TenantId { get; set; }
+        public Tenant Tenant { get; set; }
 
-        [Range(1, Int64.MaxValue)]
-        public long ModuleGroupId { get; set; }
-        [ForeignKey("ModuleGroupId")]
-        public required ModuleGroup ModuleGroup { get; set; }
+        public ICollection<PolicyModulePermission> ModulePermissions { get; set; } = new List<PolicyModulePermission>();
+        public ICollection<ApplicationUserPolicyGroup> UserPolicyGroups { get; set; } = new List<ApplicationUserPolicyGroup>();
 
-        public Module() { }
     }
 }

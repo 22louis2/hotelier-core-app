@@ -1,16 +1,25 @@
 ﻿using hotelier_core_app.Model.Attributes;
 using hotelier_core_app.Model.Interfaces;
-using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace hotelier_core_app.Model.Entities
 {
-    [Table("Role")]
-    [TableName("Role")]
+    [Table("Permission")]
+    [TableName("Permission")]
     [Serializable]
-    public class ApplicationRole : IdentityRole<long>, IBaseEntity
+    public class Permission : IBaseEntity
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public long Id { get; set; }
+
+        [StringLength(255)]
+        public string Name { get; set; }
+
+        [StringLength(255)]
+        public string Description { get; set; }
+
         [StringLength(200)]
         public string CreatedBy { get; set; }
 
@@ -19,10 +28,5 @@ namespace hotelier_core_app.Model.Entities
         public DateTime CreationDate { get; set; }
         public DateTime? LastModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
-
-        [ForeignKey("Tenant")]
-        public long? TenantId { get; set; }
-        public Tenant Tenant { get; set; }
-        public ApplicationRole() { }
     }
 }

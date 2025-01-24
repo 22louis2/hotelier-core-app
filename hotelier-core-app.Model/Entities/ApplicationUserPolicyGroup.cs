@@ -1,16 +1,18 @@
 ﻿using hotelier_core_app.Model.Attributes;
 using hotelier_core_app.Model.Interfaces;
-using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace hotelier_core_app.Model.Entities
 {
-    [Table("Role")]
-    [TableName("Role")]
+    [Table("UserPolicyGroup")]
+    [TableName("UserPolicyGroup")]
     [Serializable]
-    public class ApplicationRole : IdentityRole<long>, IBaseEntity
+    public class ApplicationUserPolicyGroup : IBaseEntity
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public long Id { get; set; }
         [StringLength(200)]
         public string CreatedBy { get; set; }
 
@@ -20,9 +22,12 @@ namespace hotelier_core_app.Model.Entities
         public DateTime? LastModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
 
-        [ForeignKey("Tenant")]
-        public long? TenantId { get; set; }
-        public Tenant Tenant { get; set; }
-        public ApplicationRole() { }
+        [ForeignKey("User")]
+        public long UserId { get; set; }
+        public ApplicationUser User { get; set; }
+
+        [ForeignKey("PolicyGroup")]
+        public long PolicyGroupId { get; set; }
+        public PolicyGroup PolicyGroup { get; set; }
     }
 }
