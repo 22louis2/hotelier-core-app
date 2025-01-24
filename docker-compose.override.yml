@@ -10,10 +10,6 @@ services:
     ports:
       - "8080:8080"
       - "8081:8081"
-    # volumes:
-    #   - ./hotelier-core-app.API:/app
-    #   - /app/bin:/app/bin
-    # command: dotnet watch run --no-launch-profile --urls=http://0.0.0.0:8080
     depends_on:
       - postgres-db
 
