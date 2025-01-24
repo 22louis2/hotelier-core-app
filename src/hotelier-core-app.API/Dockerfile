@@ -2,7 +2,7 @@
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
+#USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
@@ -12,10 +12,15 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["hotelier-core-app.API/hotelier-core-app.API.csproj", "hotelier-core-app.API/"]
-RUN dotnet restore "./hotelier-core-app.API/hotelier-core-app.API.csproj"
+COPY ["../src/hotelier-core-app.API/hotelier-core-app.API.csproj", "src/hotelier-core-app.API/"]
+COPY ["../src/hotelier-core-app.Service/hotelier-core-app.Service.csproj", "src/hotelier-core-app.Service/"]
+COPY ["../src/hotelier-core-app.Repository/hotelier-core-app.Repository.csproj", "src/hotelier-core-app.Repository/"]
+COPY ["../src/hotelier-core-app.Migrations/hotelier-core-app.Migrations.csproj", "src/hotelier-core-app.Migrations/"]
+COPY ["../src/hotelier-core-app.Model/hotelier-core-app.Model.csproj", "src/hotelier-core-app.Model/"]
+COPY ["../src/hotelier-core-app.Core/hotelier-core-app.Core.csproj", "src/hotelier-core-app.Core/"]
+RUN dotnet restore "./src/hotelier-core-app.API/hotelier-core-app.API.csproj"
 COPY . .
-WORKDIR "/src/hotelier-core-app.API"
+WORKDIR "/src/src/hotelier-core-app.API"
 RUN dotnet build "./hotelier-core-app.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
