@@ -15,10 +15,11 @@ public class SubscriptionService(
     IDBQueryRepository<SubscriptionPlan> planQueryRepository,
     IDBQueryRepository<Tenant> tenantQueryRepository,
     IDBCommandRepository<Tenant> tenantCommandRepository,
+    IDBCommandRepository<AuditLog> auditLogCommandRepository,
     IMapper mapper)
     : ISubscriptionService
 {
-    public async Task<BaseResponse> CreateSubscriptionPlanAsync(CreateSubscriptionPlanDto request)
+    public async Task<BaseResponse> CreateSubscriptionPlanAsync(CreateSubscriptionPlanDto request, AuditLog auditLog)
     {
         var existingPlan = await planQueryRepository.GetByDefaultAsync(p => p.Name == request.Name);
         if (existingPlan != null)
@@ -27,6 +28,7 @@ public class SubscriptionService(
         var plan = mapper.Map<SubscriptionPlan>(request);
         plan.CreationDate = DateTime.UtcNow;
         await planCommandRepository.AddAsync(plan);
+        await auditLogCommandRepository.AddAsync(auditLog);
 
         return BaseResponse.Success(ResponseMessages.SubscriptionCreated);
     }
@@ -47,7 +49,7 @@ public class SubscriptionService(
         return mapper.Map<List<SubscriptionPlanResponseDto>>(plans);
     }
 
-    public async Task<BaseResponse> DeleteSubscriptionPlanAsync(long id)
+    public async Task<BaseResponse> DeleteSubscriptionPlanAsync(long id, AuditLog auditLog)
     {
         var plan = await planQueryRepository.FindAsync(id);
         if (plan == null)
@@ -57,12 +59,13 @@ public class SubscriptionService(
         plan.IsDeleted = true;
         plan.LastModifiedDate = DateTime.UtcNow;
         await planCommandRepository.UpdateAsync(plan);
+        await auditLogCommandRepository.AddAsync(auditLog);
 
         return BaseResponse.Success("Subscription plan deleted successfully.");
     }
 
     
-    public async Task<BaseResponse> AssignSubscriptionPlanToTenantAsync(AssignSubscriptionPlanDto request)
+    public async Task<BaseResponse> AssignSubscriptionPlanToTenantAsync(AssignSubscriptionPlanDto request, AuditLog auditLog)
     {
         var tenant = await tenantQueryRepository.FindAsync(request.TenantId);
         if (tenant == null)
@@ -88,6 +91,7 @@ public class SubscriptionService(
         };
 
         await tenantCommandRepository.UpdateAsync(tenant);
+        await auditLogCommandRepository.AddAsync(auditLog);
 
         return BaseResponse.Success($"Subscription plan '{request.SubscriptionPlan}' assigned to tenant successfully.");
     }

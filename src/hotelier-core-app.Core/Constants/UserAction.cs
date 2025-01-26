@@ -20,6 +20,14 @@
         public const string EditModuleGroup = "Edit Module Group";
         public const string CreateModule = "Create Module";
         public const string EditModule = "Edit Module";
+        
+        //SubscriptionPlan management
+        public const string CreateSubscriptionPlan = "Create Subscription Plan";
+        public const string EditSubscriptionPlan = "Edit Subscription Plan";
+        public const string DeleteSubscriptionPlan = "Delete Subscription Plan";
+        public const string ActivateSubscriptionPlan = "Activate Subscription Plan";
+        public const string DeactivateSubscriptionPlan = "Deactivate Subscription Plan";
+        
 
     }
 }
