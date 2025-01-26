@@ -27,6 +27,8 @@ namespace hotelier_core_app.Service.AutoMapper
             CreateMap<ModuleGroup, ModuleGroupDTO>();
             CreateMap<Module, ModuleDTO>();
             CreateMap<ApplicationRole, RoleDTO>();
+            CreateMap<SubscriptionPlan, CreateSubscriptionPlanDto>();
+            CreateMap<SubscriptionPlan, SubscriptionPlanResponseDto>();
         }
     }
 }

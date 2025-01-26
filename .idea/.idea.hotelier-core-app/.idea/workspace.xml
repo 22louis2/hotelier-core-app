@@ -11,7 +11,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="71675698-6374-4b17-9acc-7c7853ec6075" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/hotelier-core-app.Core/Constants/UserAction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/hotelier-core-app.Core/Constants/UserAction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.hotelier-core-app/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.hotelier-core-app/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hotelier-core-app.Core/Constants/ResponseMessages.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/hotelier-core-app.Core/Constants/ResponseMessages.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hotelier-core-app.Model/Entities/SubscriptionPlan.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/hotelier-core-app.Model/Entities/SubscriptionPlan.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hotelier-core-app.Model/Entities/Tenant.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/hotelier-core-app.Model/Entities/Tenant.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hotelier-core-app.Service/AutoMapper/AutoMapperProfile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/hotelier-core-app.Service/AutoMapper/AutoMapperProfile.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,17 +46,7 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///Users/mac/Documents/hotelier-core-app/hotelier-core-app.API/Controllers/RoleController.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/mac/Documents/hotelier-core-app/hotelier-core-app.Core/Constants/ResponseMessages.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/mac/Documents/hotelier-core-app/hotelier-core-app.Core/Constants/ResponseMessages.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/mac/Documents/hotelier-core-app/hotelier-core-app.Core/Constants/UserAction.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/mac/Documents/hotelier-core-app/hotelier-core-app.Core/Constants/UserAction.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/mac/Documents/hotelier-core-app/hotelier-core-app.Model/DTOs/Request/CreateRoleRequestDto.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/mac/Documents/hotelier-core-app/hotelier-core-app.Model/DTOs/Request/GetRolesInputDTO.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/mac/Documents/hotelier-core-app/hotelier-core-app.Model/DTOs/Request/UpdateRoleRequestDto.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/mac/Documents/hotelier-core-app/hotelier-core-app.Model/DTOs/Response/RoleResponseDto.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/mac/Documents/hotelier-core-app/hotelier-core-app.Service/Implementation/RoleService.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/mac/Documents/hotelier-core-app/hotelier-core-app.Service/Interface/IRoleService.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1fce37416598a5fb677f9b329d52e2e9d64e126621a5229f5a5884d87827b9ad/Mapper.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/8e25cce28490c87faaf15522967e96692c1829b521f6b7a4fc8bde524eec/IdentityRole.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c049e4fa272643566050eb33d3c3e1d8648f89df6697263b665621b6f22990/Profile.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
@@ -78,7 +72,7 @@
     "HTTP Request.hotelier-core-app.API | #1.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "role__management__samson",
+    "git-widget-placeholder": "role__management__subscription__plan__samson",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -190,7 +184,7 @@
       <workItem from="1736811766399" duration="28943000" />
       <workItem from="1737390700840" duration="5518000" />
       <workItem from="1737494284977" duration="17359000" />
-      <workItem from="1737829589359" duration="7146000" />
+      <workItem from="1737829589359" duration="17348000" />
     </task>
     <servers />
   </component>
