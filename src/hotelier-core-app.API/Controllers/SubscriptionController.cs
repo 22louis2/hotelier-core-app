@@ -17,6 +17,7 @@ public class SubscriptionController(
     ITokenService tokenHelper,
     IHttpContextAccessor accessor) : ControllerBase
 {
+    [Authorize(Policy = "DeveloperPolicy")]
     [HttpPost("create-plan")]
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
     [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(BaseResponse))]
@@ -36,6 +37,7 @@ public class SubscriptionController(
         return Ok(response);
     }
     
+    [AllowAnonymous]
     [HttpGet("{id}")]
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse<SubscriptionPlanResponseDto>))]
     [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(BaseResponse))]
@@ -45,6 +47,7 @@ public class SubscriptionController(
         return response.Status ? Ok(response) : NotFound(response);
     }
     
+    [AllowAnonymous]
     [HttpGet]
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<SubscriptionPlanResponseDto>))]
     public async Task<IActionResult> GetAllSubscriptionPlans()
@@ -53,6 +56,7 @@ public class SubscriptionController(
         return Ok(response);
     }
     
+    [Authorize(Policy = "DeveloperPolicy")]
     [HttpDelete("{id}")]
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
     [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(BaseResponse))]

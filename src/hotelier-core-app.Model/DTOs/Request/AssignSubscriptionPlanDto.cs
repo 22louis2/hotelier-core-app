@@ -11,4 +11,7 @@ public class AssignSubscriptionPlanDto
     [Required]
     [EnumDataType(typeof(Subscription), ErrorMessage = "Invalid subscription plan.")]
     public Subscription SubscriptionPlan { get; set; }
+    
+    [Required]
+    public int NumberOfMonths { get; set; }
 }

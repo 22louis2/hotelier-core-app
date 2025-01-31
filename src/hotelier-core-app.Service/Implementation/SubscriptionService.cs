@@ -10,90 +10,96 @@ using hotelier_core_app.Service.Interface;
 
 namespace hotelier_core_app.Service.Implementation;
 
-public class SubscriptionService(
-    IDBCommandRepository<SubscriptionPlan> planCommandRepository,
-    IDBQueryRepository<SubscriptionPlan> planQueryRepository,
-    IDBQueryRepository<Tenant> tenantQueryRepository,
-    IDBCommandRepository<Tenant> tenantCommandRepository,
-    IDBCommandRepository<AuditLog> auditLogCommandRepository,
-    IMapper mapper)
-    : ISubscriptionService
+public class SubscriptionService : ISubscriptionService
 {
+    private readonly IDBCommandRepository<SubscriptionPlan> _planCommandRepository;
+    private readonly IDBQueryRepository<SubscriptionPlan> _planQueryRepository;
+    private readonly IDBQueryRepository<Tenant> _tenantQueryRepository;
+    private readonly IDBCommandRepository<Tenant> _tenantCommandRepository;
+    private readonly IDBCommandRepository<AuditLog> _auditLogCommandRepository;
+    private readonly IMapper _mapper;
+    
+    public SubscriptionService(IDBCommandRepository<SubscriptionPlan> planCommandRepository,
+        IDBQueryRepository<SubscriptionPlan> planQueryRepository,
+        IDBQueryRepository<Tenant> tenantQueryRepository,
+        IDBCommandRepository<Tenant> tenantCommandRepository,
+        IDBCommandRepository<AuditLog> auditLogCommandRepository,
+        IMapper mapper)
+    {
+        this._planCommandRepository = planCommandRepository;
+        this._planQueryRepository = planQueryRepository;
+        this._tenantQueryRepository = tenantQueryRepository;
+        this._tenantCommandRepository = tenantCommandRepository;
+        this._auditLogCommandRepository = auditLogCommandRepository;
+        this._mapper = mapper;
+    }
     public async Task<BaseResponse> CreateSubscriptionPlanAsync(CreateSubscriptionPlanDto request, AuditLog auditLog)
     {
-        var existingPlan = await planQueryRepository.GetByDefaultAsync(p => p.Name == request.Name);
+        var existingPlan = await _planQueryRepository.GetByDefaultAsync(p => p.Name == request.Name);
         if (existingPlan != null)
             return BaseResponse.Failure($"{ResponseMessages.SubscriptionExist}': ' {request.Name}");
 
-        var plan = mapper.Map<SubscriptionPlan>(request);
+        var plan = _mapper.Map<SubscriptionPlan>(request);
         plan.CreationDate = DateTime.UtcNow;
-        await planCommandRepository.AddAsync(plan);
-        await auditLogCommandRepository.AddAsync(auditLog);
+        await _planCommandRepository.AddAsync(plan);
+        await _auditLogCommandRepository.AddAsync(auditLog);
 
         return BaseResponse.Success(ResponseMessages.SubscriptionCreated);
     }
-    
+
     public async Task<BaseResponse<SubscriptionPlanResponseDto>> GetSubscriptionPlanByIdAsync(long id)
     {
-        var plan = await planQueryRepository.FindAsync(id);
+        var plan = await _planQueryRepository.FindAsync(id);
         if (plan == null)
             return BaseResponse<SubscriptionPlanResponseDto>.Failure(null, ResponseMessages.SubscriptionNotExist);
 
-        var response = mapper.Map<SubscriptionPlanResponseDto>(plan);
+        var response = _mapper.Map<SubscriptionPlanResponseDto>(plan);
         return BaseResponse<SubscriptionPlanResponseDto>.Success(response);
     }
-    
+
     public async Task<List<SubscriptionPlanResponseDto>> GetAllSubscriptionPlansAsync()
     {
-        var plans = await planQueryRepository.GetAllAsync();
-        return mapper.Map<List<SubscriptionPlanResponseDto>>(plans);
+        var plans = await _planQueryRepository.GetAllAsync();
+        return _mapper.Map<List<SubscriptionPlanResponseDto>>(plans);
     }
 
     public async Task<BaseResponse> DeleteSubscriptionPlanAsync(long id, AuditLog auditLog)
     {
-        var plan = await planQueryRepository.FindAsync(id);
+        var plan = await _planQueryRepository.FindAsync(id);
         if (plan == null)
             return BaseResponse.Failure("Subscription plan not found.");
 
-        // Soft delete
         plan.IsDeleted = true;
         plan.LastModifiedDate = DateTime.UtcNow;
-        await planCommandRepository.UpdateAsync(plan);
-        await auditLogCommandRepository.AddAsync(auditLog);
+        await _planCommandRepository.UpdateAsync(plan);
+        await _auditLogCommandRepository.AddAsync(auditLog);
 
         return BaseResponse.Success("Subscription plan deleted successfully.");
     }
 
-    
-    public async Task<BaseResponse> AssignSubscriptionPlanToTenantAsync(AssignSubscriptionPlanDto request, AuditLog auditLog)
+
+    public async Task<BaseResponse> AssignSubscriptionPlanToTenantAsync(AssignSubscriptionPlanDto request,
+        AuditLog auditLog)
     {
-        var tenant = await tenantQueryRepository.FindAsync(request.TenantId);
+        var tenant = await _tenantQueryRepository.FindAsync(request.TenantId);
         if (tenant == null)
             return BaseResponse.Failure($"Tenant with ID {request.TenantId} not found.");
 
-        // Check if the subscription plan exists in the database
-        var plan = await planQueryRepository.GetByDefaultAsync(p => p.Name == request.SubscriptionPlan.ToString());
+        var plan = await _planQueryRepository.GetByDefaultAsync(p => p.Name == request.SubscriptionPlan.ToString());
         if (plan == null)
             return BaseResponse.Failure($"Subscription plan '{request.SubscriptionPlan}' not found in the database.");
 
-        // Assign the subscription plan to the tenant
+        if (request.NumberOfMonths <= 0)
+            return BaseResponse.Failure("Number of months must be greater than 0.");
+
         tenant.SubscriptionPlanId = plan.Id;
         tenant.SubscriptionStartDate = DateTime.UtcNow;
+        tenant.SubscriptionEndDate = DateTime.UtcNow.AddMonths(request.NumberOfMonths);
 
-        // Example logic for subscription duration
-        tenant.SubscriptionEndDate = request.SubscriptionPlan switch
-        {
-            Subscription.Free => DateTime.UtcNow.AddMonths(1), // 1-month trial
-            Subscription.Basic => DateTime.UtcNow.AddMonths(6), // 3 months
-            Subscription.Standard => DateTime.UtcNow.AddYears(1), // 6 months
-            Subscription.Premium => DateTime.UtcNow.AddYears(1), // 1 year
-            // _ => throw new ArgumentOutOfRangeException(nameof(request.SubscriptionPlan), "Invalid subscription plan.")
-        };
+        await _tenantCommandRepository.UpdateAsync(tenant);
+        await _auditLogCommandRepository.AddAsync(auditLog);
 
-        await tenantCommandRepository.UpdateAsync(tenant);
-        await auditLogCommandRepository.AddAsync(auditLog);
-
-        return BaseResponse.Success($"Subscription plan '{request.SubscriptionPlan}' assigned to tenant successfully.");
+        return BaseResponse.Success($"Subscription plan '{request.SubscriptionPlan}' assigned to tenant for {request.NumberOfMonths} months successfully.");
     }
 
 }

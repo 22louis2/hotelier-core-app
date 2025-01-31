@@ -73,7 +73,7 @@ public class RoleController(
     [HttpGet()]
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(PageBaseResponse<List<RoleResponseDto>>))]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
-    public async Task<IActionResult> GetAllRoles([FromQuery] GetRolesInputDTO input)
+    public async Task<IActionResult> GetAllRoles([FromQuery] PaginationInputDTO input)
     {
         var response = await roleService.GetAllRolesAsync(input);
         return Ok(response);
