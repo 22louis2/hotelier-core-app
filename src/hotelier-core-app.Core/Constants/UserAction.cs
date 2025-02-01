@@ -13,12 +13,21 @@
         //Role management
         public const string CreateUserRole = "Create User Role";
         public const string EditUserRole = "Edit User Role";
+        public const string DeleteUserRole = "Delete User Role";
 
         //Module Management
         public const string CreateModuleGroup = "Create Module Group";
         public const string EditModuleGroup = "Edit Module Group";
         public const string CreateModule = "Create Module";
         public const string EditModule = "Edit Module";
+        
+        //SubscriptionPlan management
+        public const string CreateSubscriptionPlan = "Create Subscription Plan";
+        public const string EditSubscriptionPlan = "Edit Subscription Plan";
+        public const string DeleteSubscriptionPlan = "Delete Subscription Plan";
+        public const string ActivateSubscriptionPlan = "Activate Subscription Plan";
+        public const string DeactivateSubscriptionPlan = "Deactivate Subscription Plan";
+        
 
     }
 }

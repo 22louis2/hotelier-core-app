@@ -123,7 +123,8 @@ builder.Services.AddAuthentication(x =>
 });
 
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("AdminPolicy", policy => policy.RequireRole(UserRole.Admin.ToString()));
+    .AddPolicy("AdminPolicy", policy => policy.RequireRole(UserRole.Admin.ToString()))
+    .AddPolicy("DeveloperPolicy", policy => policy.RequireRole(UserRole.Developer.ToString()));
 
 builder.Services.AddCors();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
