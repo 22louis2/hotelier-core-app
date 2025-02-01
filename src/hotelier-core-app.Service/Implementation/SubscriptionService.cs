@@ -35,21 +35,24 @@ public class SubscriptionService : ISubscriptionService
     }
     public async Task<BaseResponse> CreateSubscriptionPlanAsync(CreateSubscriptionPlanDto request, AuditLog auditLog)
     {
-        var existingPlan = await _planQueryRepository.GetByDefaultAsync(p => p.Name == request.Name);
+        var existingPlan = await _planQueryRepository.GetByDefaultAsync(p => p.Name == request.Name && p.IsDeleted == false);
         if (existingPlan != null)
             return BaseResponse.Failure($"{ResponseMessages.SubscriptionExist}': ' {request.Name}");
 
         var plan = _mapper.Map<SubscriptionPlan>(request);
         plan.CreationDate = DateTime.UtcNow;
+        plan.CreatedBy = auditLog.PerformedBy;
         await _planCommandRepository.AddAsync(plan);
+        await _planCommandRepository.SaveAsync();
         await _auditLogCommandRepository.AddAsync(auditLog);
-
+        await _auditLogCommandRepository.SaveAsync();
         return BaseResponse.Success(ResponseMessages.SubscriptionCreated);
     }
 
     public async Task<BaseResponse<SubscriptionPlanResponseDto>> GetSubscriptionPlanByIdAsync(long id)
     {
         var plan = await _planQueryRepository.FindAsync(id);
+        Console.WriteLine(plan.ToString());
         if (plan == null)
             return BaseResponse<SubscriptionPlanResponseDto>.Failure(null, ResponseMessages.SubscriptionNotExist);
 
@@ -57,10 +60,11 @@ public class SubscriptionService : ISubscriptionService
         return BaseResponse<SubscriptionPlanResponseDto>.Success(response);
     }
 
-    public async Task<List<SubscriptionPlanResponseDto>> GetAllSubscriptionPlansAsync()
+    public async Task<BaseResponse<List<SubscriptionPlanResponseDto>>> GetAllSubscriptionPlansAsync()
     {
         var plans = await _planQueryRepository.GetAllAsync();
-        return _mapper.Map<List<SubscriptionPlanResponseDto>>(plans);
+        var response =  _mapper.Map<List<SubscriptionPlanResponseDto>>(plans);
+        return BaseResponse<List<SubscriptionPlanResponseDto>>.Success(response);
     }
 
     public async Task<BaseResponse> DeleteSubscriptionPlanAsync(long id, AuditLog auditLog)
@@ -71,8 +75,10 @@ public class SubscriptionService : ISubscriptionService
 
         plan.IsDeleted = true;
         plan.LastModifiedDate = DateTime.UtcNow;
+        plan.ModifiedBy = auditLog.PerformedBy;
         await _planCommandRepository.UpdateAsync(plan);
         await _auditLogCommandRepository.AddAsync(auditLog);
+        await _auditLogCommandRepository.SaveAsync();
 
         return BaseResponse.Success("Subscription plan deleted successfully.");
     }
@@ -98,6 +104,7 @@ public class SubscriptionService : ISubscriptionService
 
         await _tenantCommandRepository.UpdateAsync(tenant);
         await _auditLogCommandRepository.AddAsync(auditLog);
+        await _auditLogCommandRepository.SaveAsync();
 
         return BaseResponse.Success($"Subscription plan '{request.SubscriptionPlan}' assigned to tenant for {request.NumberOfMonths} months successfully.");
     }

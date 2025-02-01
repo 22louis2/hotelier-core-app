@@ -7,4 +7,10 @@ public class SubscriptionPlanResponseDto
     public string Description { get; set; }
     public decimal Price { get; set; }
     public long? DiscountId { get; set; }
+    
+    public DateTime? CreationDate { get; set; }
+
+    public DateTime? LastModifiedDate { get; set; }
+
+    public bool IsDeleted { get; set; }
 }

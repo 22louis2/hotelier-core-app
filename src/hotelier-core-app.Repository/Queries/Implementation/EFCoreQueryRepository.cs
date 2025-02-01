@@ -32,9 +32,9 @@ namespace hotelier_core_app.Domain.Queries.Implementation
             throw new NotImplementedException();
         }
 
-        public Task<TEntity> FindAsync(object id)
+        public async Task<TEntity?> FindAsync(object id)
         {
-            throw new NotImplementedException();
+            return await _dbSet.FindAsync(id);
         }
 
         public IEnumerable<TEntity> GetAll(string connectionString)

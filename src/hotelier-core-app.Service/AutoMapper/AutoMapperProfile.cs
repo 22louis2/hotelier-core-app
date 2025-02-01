@@ -27,7 +27,10 @@ namespace hotelier_core_app.Service.AutoMapper
             CreateMap<ModuleGroup, ModuleGroupDTO>();
             CreateMap<Module, ModuleDTO>();
             CreateMap<ApplicationRole, RoleDTO>();
-            CreateMap<SubscriptionPlan, CreateSubscriptionPlanDto>();
+            CreateMap<CreateSubscriptionPlanDto, SubscriptionPlan>()
+                .ForMember(dest => dest.CreationDate, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.LastModifiedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => false));
             CreateMap<SubscriptionPlan, SubscriptionPlanResponseDto>();
         }
     }

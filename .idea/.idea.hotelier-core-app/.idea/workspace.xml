@@ -11,8 +11,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="71675698-6374-4b17-9acc-7c7853ec6075" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.hotelier-core-app/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.hotelier-core-app/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hotelier-core-app.API/Controllers/RoleController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/hotelier-core-app.API/Controllers/RoleController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hotelier-core-app.API/Controllers/SubscriptionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/hotelier-core-app.API/Controllers/SubscriptionController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hotelier-core-app.Migrations/DesignTimeDbContextFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/hotelier-core-app.Migrations/DesignTimeDbContextFactory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hotelier-core-app.Model/DTOs/Response/SubscriptionPlanResponseDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/hotelier-core-app.Model/DTOs/Response/SubscriptionPlanResponseDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hotelier-core-app.Repository/Commands/Implementation/EFCoreCommandRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/hotelier-core-app.Repository/Commands/Implementation/EFCoreCommandRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hotelier-core-app.Repository/Queries/Implementation/EFCoreQueryRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/hotelier-core-app.Repository/Queries/Implementation/EFCoreQueryRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hotelier-core-app.Service/AutoMapper/AutoMapperProfile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/hotelier-core-app.Service/AutoMapper/AutoMapperProfile.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/hotelier-core-app.Service/Implementation/SubscriptionService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/hotelier-core-app.Service/Implementation/SubscriptionService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/hotelier-core-app.Service/Interface/ISubscriptionService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/hotelier-core-app.Service/Interface/ISubscriptionService.cs" afterDir="false" />
     </list>
@@ -53,6 +59,9 @@
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
 }</component>
@@ -67,11 +76,12 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     ".NET Launch Settings Profile.hotelier-core-app.API: http.executor": "Run",
+    ".NET Project.hotelier-core-app.API.executor": "Run",
     "Docker.hotelier-core-app.API/Dockerfile.executor": "Run",
     "HTTP Request.hotelier-core-app.API | #1.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "role__management__subscription__plan__samson",
+    "git-widget-placeholder": "#13 on role__management__and__subscription__plan",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -79,9 +89,14 @@
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "com.microsoft.azure.toolkit.intellij.storage.azurite.settings.AzuriteConfigurable",
     "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql"
+    ]
   }
 }]]></component>
-  <component name="RunManager" selected="Docker.hotelier-core-app.API/Dockerfile">
+  <component name="RunManager" selected=".NET Project.hotelier-core-app.API">
     <configuration name="hotelier-core-app.API" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -183,7 +198,8 @@
       <workItem from="1736811766399" duration="28943000" />
       <workItem from="1737390700840" duration="5518000" />
       <workItem from="1737494284977" duration="17359000" />
-      <workItem from="1737829589359" duration="18798000" />
+      <workItem from="1737829589359" duration="24439000" />
+      <workItem from="1738129612310" duration="24577000" />
     </task>
     <servers />
   </component>

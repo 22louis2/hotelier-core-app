@@ -9,12 +9,27 @@ namespace hotelier_core_app.Migrations
         public AppDbContext CreateDbContext(string[] args)
         {
             string jsonPath = "appsettings.json";
+            var basePath = Directory.GetCurrentDirectory();
+
             IConfigurationRoot configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile($"{@Directory.GetCurrentDirectory()}\\{jsonPath}").Build();
+                .SetBasePath(basePath)
+                .AddJsonFile(Path.Combine(basePath, jsonPath), optional: false, reloadOnChange: true)
+                .Build();
+
+            string? connectionString = configuration.GetConnectionString("DbConnectionString");
+            Console.WriteLine($"Loaded Connection String: {connectionString}");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new ArgumentException("⚠️ Database connection string is null or empty! Check appsettings.json.");
+            }
+
             var builder = new DbContextOptionsBuilder<AppDbContext>();
-            builder.UseNpgsql(configuration.GetConnectionString("DbConnectionString"));
+            builder.UseNpgsql(connectionString);
+
             return new AppDbContext(builder.Options);
         }
     }
+
+
 }

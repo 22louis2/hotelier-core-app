@@ -11,13 +11,21 @@ namespace hotelier_core_app.API.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-[Authorize]
-public class SubscriptionController(
-    ISubscriptionService subscriptionService, 
-    ITokenService tokenHelper,
-    IHttpContextAccessor accessor) : ControllerBase
+// [Authorize]
+public class SubscriptionController : ControllerBase
 {
-    [Authorize(Policy = "DeveloperPolicy")]
+    private readonly ISubscriptionService _subscriptionService;
+    private readonly ITokenService _tokenService;
+    private readonly IHttpContextAccessor _accessor;
+    
+    public SubscriptionController(ISubscriptionService subscriptionService, ITokenService tokenService, IHttpContextAccessor accessor)
+    {
+        this._subscriptionService = subscriptionService;
+        this._tokenService = tokenService;
+        this._accessor = accessor;
+    }
+    
+    // [Authorize(Policy = "DeveloperPolicy")]
     [HttpPost("create-plan")]
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
     [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(BaseResponse))]
@@ -27,13 +35,13 @@ public class SubscriptionController(
         {
             Action = UserAction.CreateSubscriptionPlan,
             DatePerformed = DateTime.UtcNow,
-            PerformedBy = tokenHelper.GetUserFullName(Request),
-            IpAddress = accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
-            PerformerEmail = tokenHelper.GetUserEmail(Request),
+            PerformedBy = _tokenService.GetUserFullName(Request),
+            IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
+            // PerformerEmail = _tokenService.GetUserEmail(Request),
             PerformedAgainst = request.Name,
-            MacAddress = tokenHelper.GetMacAddress(Request)
+            // MacAddress = _tokenService.GetMacAddress(Request)
         };
-        var response = await subscriptionService.CreateSubscriptionPlanAsync(request, auditLog);
+        var response = await _subscriptionService.CreateSubscriptionPlanAsync(request, auditLog);
         return Ok(response);
     }
     
@@ -43,8 +51,8 @@ public class SubscriptionController(
     [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(BaseResponse))]
     public async Task<IActionResult> GetSubscriptionPlanById(long id)
     {
-        var response = await subscriptionService.GetSubscriptionPlanByIdAsync(id);
-        return response.Status ? Ok(response) : NotFound(response);
+        var response = await _subscriptionService.GetSubscriptionPlanByIdAsync(id);
+        return Ok(response);
     }
     
     [AllowAnonymous]
@@ -52,11 +60,11 @@ public class SubscriptionController(
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<SubscriptionPlanResponseDto>))]
     public async Task<IActionResult> GetAllSubscriptionPlans()
     {
-        var response = await subscriptionService.GetAllSubscriptionPlansAsync();
+        var response = await _subscriptionService.GetAllSubscriptionPlansAsync();
         return Ok(response);
     }
     
-    [Authorize(Policy = "DeveloperPolicy")]
+    // [Authorize(Policy = "DeveloperPolicy")]
     [HttpDelete("{id}")]
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
     [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(BaseResponse))]
@@ -66,13 +74,13 @@ public class SubscriptionController(
         {
             Action = UserAction.DeleteSubscriptionPlan,
             DatePerformed = DateTime.UtcNow,
-            PerformedBy = tokenHelper.GetUserFullName(Request),
-            IpAddress = accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
-            PerformerEmail = tokenHelper.GetUserEmail(Request),
+            PerformedBy = _tokenService.GetUserFullName(Request),
+            IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
+            PerformerEmail = _tokenService.GetUserEmail(Request),
             PerformedAgainst = id.ToString(),
-            MacAddress = tokenHelper.GetMacAddress(Request)
+            // MacAddress = _tokenService.GetMacAddress(Request)
         };
-        var response = await subscriptionService.DeleteSubscriptionPlanAsync(id, auditLog);
+        var response = await _subscriptionService.DeleteSubscriptionPlanAsync(id, auditLog);
         return response.Status ? Ok(response) : BadRequest(response);
     }
     
@@ -85,13 +93,13 @@ public class SubscriptionController(
         {
             Action = UserAction.ActivateSubscriptionPlan,
             DatePerformed = DateTime.UtcNow,
-            PerformedBy = tokenHelper.GetUserFullName(Request),
-            IpAddress = accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
-            PerformerEmail = tokenHelper.GetUserEmail(Request),
+            PerformedBy = _tokenService.GetUserFullName(Request),
+            IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
+            // PerformerEmail = _tokenService.GetUserEmail(Request),
             PerformedAgainst = request.TenantId.ToString(),
-            MacAddress = tokenHelper.GetMacAddress(Request)
+            // MacAddress = _tokenService.GetMacAddress(Request)
         };
-        var response = await subscriptionService.AssignSubscriptionPlanToTenantAsync(request, auditLog);
+        var response = await _subscriptionService.AssignSubscriptionPlanToTenantAsync(request, auditLog);
         return response.Status ? Ok(response) : BadRequest(response);
     }
 }
