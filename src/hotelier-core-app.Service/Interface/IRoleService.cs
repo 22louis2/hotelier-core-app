@@ -8,7 +8,7 @@ namespace hotelier_core_app.Service.Interface
     {
         Task<BaseResponse> CreateRoleAsync(CreateRoleRequestDto request, AuditLog auditLog);
         Task<BaseResponse<RoleResponseDto>> GetRoleByIdAsync(long roleId);
-        Task<PageBaseResponse<List<RoleResponseDto>>> GetAllRolesAsync(PaginationInputDTO input);
+        Task<BaseResponse<List<RoleResponseDto>>> GetAllRolesAsync();
         Task<BaseResponse> UpdateRoleAsync(UpdateRoleRequestDto request, AuditLog auditLog);
         Task<BaseResponse> DeleteRoleAsync(long roleId, AuditLog auditLog);
     }

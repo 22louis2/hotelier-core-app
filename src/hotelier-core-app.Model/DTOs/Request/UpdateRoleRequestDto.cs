@@ -4,5 +4,4 @@ public class UpdateRoleRequestDto
 {
     public long Id { get; set; }
     public string RoleName { get; set; }
-    public string ModifiedBy { get; set; }
 }

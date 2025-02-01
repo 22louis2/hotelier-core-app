@@ -13,12 +13,19 @@ namespace hotelier_core_app.API.Controllers;
 [Route("api/v1/[controller]")]
 [ApiController]
 [Authorize]
-public class RoleController(
-    IRoleService roleService,
-    ITokenService tokenHelper,
-    IHttpContextAccessor accessor)
-    : ControllerBase
+public class RoleController : ControllerBase
 {
+    private readonly IRoleService _roleService;
+    private readonly ITokenService _tokenService;
+    private readonly IHttpContextAccessor _accessor;
+    
+    public RoleController(IRoleService roleService, ITokenService tokenService, IHttpContextAccessor accessor)
+    {
+        this._roleService = roleService;
+        this._tokenService = tokenService;
+        this._accessor = accessor;
+    }
+        
     [HttpPost("create-role")]
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
@@ -29,14 +36,14 @@ public class RoleController(
         {
             Action = UserAction.CreateUserRole,
             DatePerformed = DateTime.UtcNow,
-            PerformedBy = tokenHelper.GetUserFullName(Request),
-            IpAddress = accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
-            PerformerEmail = tokenHelper.GetUserEmail(Request),
+            PerformedBy = _tokenService.GetUserFullName(Request),
+            IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
+            PerformerEmail = _tokenService.GetUserEmail(Request),
             PerformedAgainst = request.RoleName,
-            MacAddress = tokenHelper.GetMacAddress(Request)
+            MacAddress = _tokenService.GetMacAddress(Request)
         };
 
-        var response = await roleService.CreateRoleAsync(request, auditLog);
+        var response = await _roleService.CreateRoleAsync(request, auditLog);
         return Ok(response);
     }
     
@@ -50,14 +57,14 @@ public class RoleController(
         {
             Action = UserAction.EditUserRole,
             DatePerformed = DateTime.UtcNow,
-            PerformedBy = tokenHelper.GetUserFullName(Request),
-            IpAddress = accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
-            PerformerEmail = tokenHelper.GetUserEmail(Request),
+            PerformedBy = _tokenService.GetUserFullName(Request),
+            IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
+            PerformerEmail = _tokenService.GetUserEmail(Request),
             PerformedAgainst = request.RoleName,
-            MacAddress = tokenHelper.GetMacAddress(Request)
+            MacAddress = _tokenService.GetMacAddress(Request)
         };
 
-        var response = await roleService.UpdateRoleAsync(request, auditLog);
+        var response = await _roleService.UpdateRoleAsync(request, auditLog);
         return Ok(response);
     }
     
@@ -66,16 +73,16 @@ public class RoleController(
     [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
     public async Task<IActionResult> GetRoleById(long id)
     {
-        var response = await roleService.GetRoleByIdAsync(id);
+        var response = await _roleService.GetRoleByIdAsync(id);
         return Ok(response);
     }
     
     [HttpGet()]
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(PageBaseResponse<List<RoleResponseDto>>))]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
-    public async Task<IActionResult> GetAllRoles([FromQuery] PaginationInputDTO input)
+    public async Task<IActionResult> GetAllRoles()
     {
-        var response = await roleService.GetAllRolesAsync(input);
+        var response = await _roleService.GetAllRolesAsync();
         return Ok(response);
     }
     
@@ -88,14 +95,14 @@ public class RoleController(
         {
             Action = UserAction.DeleteUserRole,
             DatePerformed = DateTime.UtcNow,
-            PerformedBy = tokenHelper.GetUserFullName(Request),
-            IpAddress = accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
-            PerformerEmail = tokenHelper.GetUserEmail(Request),
+            PerformedBy = _tokenService.GetUserFullName(Request),
+            IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
+            PerformerEmail = _tokenService.GetUserEmail(Request),
             PerformedAgainst = $"Role ID: {id}",
-            MacAddress = tokenHelper.GetMacAddress(Request)
+            MacAddress = _tokenService.GetMacAddress(Request)
         };
 
-        var response = await roleService.DeleteRoleAsync(id, auditLog);
+        var response = await _roleService.DeleteRoleAsync(id, auditLog);
         return Ok(response);
     }
 }
