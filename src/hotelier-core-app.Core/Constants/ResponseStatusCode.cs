@@ -62,5 +62,8 @@
 
         public const string InvalidCredential = "047";
         public const string UserEmailNotConfirmed = "048";
+
+        // Policy Management
+        public const string PolicyGroupExists = "049";
     }
 }
