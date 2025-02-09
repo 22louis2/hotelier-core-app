@@ -6,6 +6,7 @@ namespace hotelier_core_app.Service.Interface
 {
     public interface IPolicyGroupService : IAutoDependencyService
     {
+        Task<BaseResponse<List<PermissionDTO>>> GetAllPermission();
         Task<BaseResponse> AddPolicyGroup(AddPolicyGroupDTO request, AuditLog auditLog);
         Task<BaseResponse> UpdatePolicyGroup(UpdatePolicyGroupDTO request, AuditLog auditLog);
         // delete policy group (soft or not?)

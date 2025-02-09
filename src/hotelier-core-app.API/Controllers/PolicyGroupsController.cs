@@ -3,6 +3,7 @@ using hotelier_core_app.Core.Constants;
 using hotelier_core_app.Model.DTOs.Request;
 using hotelier_core_app.Model.DTOs.Response;
 using hotelier_core_app.Model.Entities;
+using hotelier_core_app.Service.Implementation;
 using hotelier_core_app.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -24,6 +25,16 @@ namespace hotelier_core_app.API.Controllers
             _policyGroupService = policyGroupService;
             _tokenHelper = tokenHelper;
             _accessor = accessor;
+        }
+
+        [HttpGet("permissions")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse<List<PermissionDTO>>))]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ValidationResultModel))]
+        public async Task<IActionResult> GetAllPermission()
+        {
+            BaseResponse<List<PermissionDTO>> response = await _policyGroupService.GetAllPermission();
+            return Ok(response);
         }
 
         [HttpPost]
