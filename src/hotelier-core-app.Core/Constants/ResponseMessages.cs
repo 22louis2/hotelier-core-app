@@ -59,5 +59,13 @@
 
         public const string InvalidCredential = "Invalid Credentials";
         public const string UserEmailNotConfirmed = "User's email has not been confirmed";
+        
+        //Subscription service
+        public const string SubscriptionExist = "Subscription already exist";
+        public const string SubscriptionNotExist = "Subscription does not exist";
+        public const string SubscriptionCreated = "Subscription created successfully";
+        public const string SubscriptionUpdated = "Subscription updated successfully";
+        public const string SubscriptionRemoved = "Subscription removed successfully";
+        public const string Subscribed = "Subscribed to plan successfully";
     }
 }

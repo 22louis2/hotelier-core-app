@@ -29,6 +29,9 @@ namespace hotelier_core_app.Model.Entities
 
         [StringLength(200)]
         public string? ModifiedBy { get; set; }
+        
+        public DateTime? SubscriptionStartDate { get; set; }
+        public DateTime? SubscriptionEndDate { get; set; }
 
         public DateTime CreationDate { get; set; }
         public DateTime? LastModifiedDate { get; set; }

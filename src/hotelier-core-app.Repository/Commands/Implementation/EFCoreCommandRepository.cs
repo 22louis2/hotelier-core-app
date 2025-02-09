@@ -163,9 +163,11 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             _context.Entry(entity).State = EntityState.Modified;
         }
 
-        public Task UpdateAsync(TEntity entity)
+        public async Task UpdateAsync(TEntity entity)
         {
-            throw new NotImplementedException();
+            _dbSet.Attach(entity);
+            _context.Entry(entity).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
         }
 
         public void UpdateRange(IEnumerable<TEntity> entities)
