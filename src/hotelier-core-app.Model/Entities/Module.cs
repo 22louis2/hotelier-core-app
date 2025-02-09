@@ -14,6 +14,15 @@ namespace hotelier_core_app.Model.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
+        [StringLength(255)]
+        public string Name { get; set; }
+
+        [StringLength(500)]
+        public string Description { get; set; }
+
+        [StringLength(500)]
+        public string Url { get; set; }
+
         [StringLength(200)]
         public string CreatedBy { get; set; }
 
@@ -27,7 +36,7 @@ namespace hotelier_core_app.Model.Entities
         [Range(1, Int64.MaxValue)]
         public long ModuleGroupId { get; set; }
         [ForeignKey("ModuleGroupId")]
-        public required ModuleGroup ModuleGroup { get; set; }
+        public ModuleGroup ModuleGroup { get; set; }
 
         public Module() { }
     }
