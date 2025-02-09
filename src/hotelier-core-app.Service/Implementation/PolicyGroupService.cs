@@ -49,6 +49,14 @@ namespace hotelier_core_app.Service.Implementation
             _mapper = mapper;
         }
 
+        public async Task<BaseResponse<List<PermissionDTO>>> GetAllPermission()
+        {
+            IList<Permission> permissions = (await _permissionQueryRepository.GetAllAsync()).ToList();
+            List<PermissionDTO> permissionsDTO = _mapper.Map<List<PermissionDTO>>(permissions);
+
+            return BaseResponse<List<PermissionDTO>>.Success(permissionsDTO, ResponseMessages.OperationSuccessful, ResponseStatusCode.OperationSuccessful);
+        }
+
         public async Task<BaseResponse> AddPolicyGroup(AddPolicyGroupDTO request, AuditLog auditLog)
         {
             // confirm policy with same name does not exist for tenant

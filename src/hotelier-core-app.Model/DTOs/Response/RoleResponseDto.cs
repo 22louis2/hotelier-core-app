@@ -1,6 +1,6 @@
 namespace hotelier_core_app.Model.DTOs.Response;
 
-public class RoleResponseDto
+public class RoleResponseDTO
 {
     public long Id { get; set; }
     public string Name { get; set; }

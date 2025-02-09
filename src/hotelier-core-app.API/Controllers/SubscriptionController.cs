@@ -29,7 +29,7 @@ public class SubscriptionController : ControllerBase
     [HttpPost("create-plan")]
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
     [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(BaseResponse))]
-    public async Task<IActionResult> CreateSubscriptionPlan([FromBody] CreateSubscriptionPlanDto request)
+    public async Task<IActionResult> CreateSubscriptionPlan([FromBody] CreateSubscriptionPlanDTO request)
     {
         AuditLog auditLog = new AuditLog
         {
@@ -47,7 +47,7 @@ public class SubscriptionController : ControllerBase
     
     [AllowAnonymous]
     [HttpGet("{id}")]
-    [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse<SubscriptionPlanResponseDto>))]
+    [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse<SubscriptionPlanResponseDTO>))]
     [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(BaseResponse))]
     public async Task<IActionResult> GetSubscriptionPlanById(long id)
     {
@@ -57,7 +57,7 @@ public class SubscriptionController : ControllerBase
     
     [AllowAnonymous]
     [HttpGet]
-    [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<SubscriptionPlanResponseDto>))]
+    [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(List<SubscriptionPlanResponseDTO>))]
     public async Task<IActionResult> GetAllSubscriptionPlans()
     {
         var response = await _subscriptionService.GetAllSubscriptionPlansAsync();
@@ -87,7 +87,7 @@ public class SubscriptionController : ControllerBase
     [HttpPost("subscribe")]
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
     [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(BaseResponse))]
-    public async Task<IActionResult> AssignSubscriptionPlanToTenant([FromBody] AssignSubscriptionPlanDto request)
+    public async Task<IActionResult> AssignSubscriptionPlanToTenant([FromBody] AssignSubscriptionPlanDTO request)
     {
         AuditLog auditLog = new AuditLog
         {

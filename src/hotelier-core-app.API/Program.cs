@@ -155,6 +155,8 @@ builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory())
 
 var app = builder.Build();
 
+DatabaseSeeder.Seeder(app.Services).Wait();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

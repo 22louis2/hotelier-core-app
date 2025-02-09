@@ -27,7 +27,7 @@ public class RoleService : IRoleService
         this._auditLogCommandRepository = auditLogCommandRepository;
         this._mapper = mapper;
     }
-    public async Task<BaseResponse> CreateRoleAsync(CreateRoleRequestDto request, AuditLog auditLog)
+    public async Task<BaseResponse> CreateRoleAsync(CreateRoleRequestDTO request, AuditLog auditLog)
     {
         var existingRole = await _roleQueryRepository.GetByDefaultAsync(r => r.Name == request.RoleName && r.IsDeleted == false);
         if (existingRole != null) return BaseResponse.Failure(ResponseMessages.RoleExist);
@@ -44,7 +44,7 @@ public class RoleService : IRoleService
         return BaseResponse.Success("Role created successfully.");
     }
 
-    public async Task<BaseResponse> UpdateRoleAsync(UpdateRoleRequestDto request, AuditLog auditLog)
+    public async Task<BaseResponse> UpdateRoleAsync(UpdateRoleRequestDTO request, AuditLog auditLog)
     {
         var role = await _roleQueryRepository.FindAsync(request.Id);
         if (role == null) return BaseResponse.Failure(ResponseMessages.RoleNotExist);
@@ -59,20 +59,20 @@ public class RoleService : IRoleService
         return BaseResponse.Success("Role updated successfully.");
     }
     
-    public async Task<BaseResponse<RoleResponseDto>> GetRoleByIdAsync(long id)
+    public async Task<BaseResponse<RoleResponseDTO>> GetRoleByIdAsync(long id)
     {
         var role = await _roleQueryRepository.FindAsync(id);
-        if (role == null) return BaseResponse<RoleResponseDto>.Failure(new RoleResponseDto(), ResponseMessages.RoleNotExist);
+        if (role == null) return BaseResponse<RoleResponseDTO>.Failure(new RoleResponseDTO(), ResponseMessages.RoleNotExist);
 
-        var response = _mapper.Map<RoleResponseDto>(role);
-        return BaseResponse<RoleResponseDto>.Success(response);
+        var response = _mapper.Map<RoleResponseDTO>(role);
+        return BaseResponse<RoleResponseDTO>.Success(response);
     }
     
-    public async Task<BaseResponse<List<RoleResponseDto>>> GetAllRolesAsync()
+    public async Task<BaseResponse<List<RoleResponseDTO>>> GetAllRolesAsync()
     {
         var roles = await _roleQueryRepository.GetAllAsync();
-        var response = _mapper.Map<List<RoleResponseDto>>(roles);
-        return BaseResponse<List<RoleResponseDto>>.Success(response);
+        var response = _mapper.Map<List<RoleResponseDTO>>(roles);
+        return BaseResponse<List<RoleResponseDTO>>.Success(response);
     }
     
     public async Task<BaseResponse> DeleteRoleAsync(long id, AuditLog auditLog)
