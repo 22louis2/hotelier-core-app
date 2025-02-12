@@ -95,7 +95,7 @@ namespace hotelier_core_app.API.Controllers
             return Ok(response);
         }
 
-        [HttpPost("add-user")]
+        [HttpPost("users")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ValidationResultModel))]
@@ -114,11 +114,11 @@ namespace hotelier_core_app.API.Controllers
             return Ok(response);
         }
 
-        [HttpPost("remove-user")]
+        [HttpDelete("{policyGroupId}/users/{userId}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ValidationResultModel))]
-        public async Task<IActionResult> RemoveUserFromPolicyGroup([FromQuery] long userId, [FromQuery] long policyGroupId)
+        public async Task<IActionResult> RemoveUserFromPolicyGroup(long userId, long policyGroupId)
         {
             AuditLog auditLog = new AuditLog
             {
@@ -133,11 +133,11 @@ namespace hotelier_core_app.API.Controllers
             return Ok(response);
         }
 
-        [HttpPost("add-permission")]
+        [HttpPost("policies")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ValidationResultModel))]
-        public async Task<IActionResult> AddPermissionToPolicyGroup([FromQuery] long policyGroupId, [FromQuery] long moduleGroupId, [FromQuery] long permissionId)
+        public async Task<IActionResult> AddPolicyToPolicyGroup(AddPolicyToPolicyGroupDTO request)
         {
             AuditLog auditLog = new AuditLog
             {
@@ -148,15 +148,15 @@ namespace hotelier_core_app.API.Controllers
                 PerformerEmail = _tokenHelper.GetUserEmail(Request),
                 MacAddress = _tokenHelper.GetMacAddress(Request)
             };
-            BaseResponse response = await _policyGroupService.AddPermissionToPolicyGroup(policyGroupId, moduleGroupId, permissionId, auditLog);
+            BaseResponse response = await _policyGroupService.AddPolicyToPolicyGroup(request, auditLog);
             return Ok(response);
         }
 
-        [HttpPost("remove-permission")]
+        [HttpDelete("{policyGroupId}/policies/{policyId}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ValidationResultModel))]
-        public async Task<IActionResult> RemovePermissionFromPolicyGroup([FromQuery] long policyGroupId, [FromQuery] long moduleGroupId, [FromQuery] long permissionId)
+        public async Task<IActionResult> RemovePolicyFromPolicyGroup([FromQuery] long policyGroupId, [FromQuery] long moduleGroupId, [FromQuery] long policyId)
         {
             AuditLog auditLog = new AuditLog
             {
@@ -167,7 +167,7 @@ namespace hotelier_core_app.API.Controllers
                 PerformerEmail = _tokenHelper.GetUserEmail(Request),
                 MacAddress = _tokenHelper.GetMacAddress(Request)
             };
-            BaseResponse response = await _policyGroupService.RemovePermissionFromPolicyGroup(policyGroupId, moduleGroupId, permissionId, auditLog);
+            BaseResponse response = await _policyGroupService.RemovePolicyFromPolicyGroup(policyGroupId, policyId, auditLog);
             return Ok(response);
         }
     }

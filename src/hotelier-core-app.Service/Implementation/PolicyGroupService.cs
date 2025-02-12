@@ -135,21 +135,21 @@ namespace hotelier_core_app.Service.Implementation
             return BaseResponse.Success();
         }
 
-        public async Task<BaseResponse> AddPermissionToPolicyGroup(long policyGroupId, long moduleGroupId, long permissionId, AuditLog auditLog)
+        public async Task<BaseResponse> AddPolicyToPolicyGroup(AddPolicyToPolicyGroupDTO request, AuditLog auditLog)
         {
-            PolicyGroup policyGroup = await _policyGroupQueryRepository.FindAsync(policyGroupId);
+            PolicyGroup policyGroup = await _policyGroupQueryRepository.FindAsync(request.PolicyGroupId);
             if (policyGroup == null) return BaseResponse.Failure(ResponseMessages.PolicyGroupDoesNotExist);
 
-            var moduleGroup = _moduleGroupQueryRepository.FindAsync(moduleGroupId);
-            if(moduleGroup == null) return BaseResponse.Failure(ResponseMessages.ModuleGroupNotExist);
+            var permission = await _permissionQueryRepository.FindAsync(request.PolicyId);
+            if(permission == null) return BaseResponse.Failure(ResponseMessages.PolicyDoesNotExist);
 
-            var permission = _permissionQueryRepository.FindAsync(permissionId);
-            if(permission == null) return BaseResponse.Failure(ResponseMessages.PermissionDoesNotExist);
+            var moduleGroup = await _moduleGroupQueryRepository.FindAsync(request.ModuleGroupId);
+            if (moduleGroup == null) return BaseResponse.Failure(ResponseMessages.ModuleGroupNotExist);
 
             var pmp = new PolicyModulePermission();
-            pmp.PermissionId = permissionId;
-            pmp.PolicyGroupId = policyGroupId;
-            pmp.ModuleGroupId = moduleGroupId;
+            pmp.PermissionId = request.PolicyId;
+            pmp.PolicyGroupId = request.PolicyGroupId;
+            pmp.ModuleGroupId = request.ModuleGroupId;
             pmp.CreatedBy = auditLog.PerformerEmail;
             pmp.CreationDate = DateTime.Now;
 
@@ -160,10 +160,10 @@ namespace hotelier_core_app.Service.Implementation
             return BaseResponse.Success();
         }
 
-        public async Task<BaseResponse> RemovePermissionFromPolicyGroup(long policyGroupId, long moduleGroupId, long permissionId, AuditLog auditLog)
+        public async Task<BaseResponse> RemovePolicyFromPolicyGroup(long policyGroupId, long permissionId, AuditLog auditLog)
         {
-            var pmp = _pmpQueryRepository.GetByDefaultAsync(p => p.PermissionId == permissionId && p.PolicyGroupId == policyGroupId && p.ModuleGroupId == moduleGroupId);
-            if (pmp == null) return BaseResponse.Failure(ResponseMessages.PermissionDoesNotExist);
+            var pmp = _pmpQueryRepository.GetByDefaultAsync(p => p.PermissionId == permissionId && p.PolicyGroupId == policyGroupId);
+            if (pmp == null) return BaseResponse.Failure(ResponseMessages.PolicyDoesNotExist);
 
             _auditLogCommandRepository.Add(auditLog);
             _pmpCommandRepository.Delete(pmp);
