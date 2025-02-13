@@ -76,11 +76,45 @@ namespace hotelier_core_app.Migrations
                 }
             };
 
+            List<SubscriptionPlan> subscriptions = new List<SubscriptionPlan>
+            {
+                new SubscriptionPlan
+                {
+                    Name = "Free",
+                    Description = "Free plan",
+                    Price = 0,
+                    CreatedBy = "System",
+                    CreationDate = DateTime.UtcNow
+                },
+                new SubscriptionPlan
+                {
+                    Name = "Standard",
+                    Description = "Standard plan",
+                    Price = 1000,
+                    CreatedBy = "System",
+                    CreationDate = DateTime.UtcNow
+                },
+                new SubscriptionPlan
+                {
+                    Name = "Premium",
+                    Description = "Premium plan",
+                    Price = 5000,
+                    CreatedBy = "System",
+                    CreationDate = DateTime.UtcNow
+                }
+            };
+
             if (!context.Permission.Any())
             {
                 await context.Permission.AddRangeAsync(permissions);
-                await context.SaveChangesAsync();
             }
+
+            if(!context.SubscriptionPlans.Any())
+            {
+                await context.AddRangeAsync(subscriptions);
+            }
+
+            await context.SaveChangesAsync();
 
             return;
         }

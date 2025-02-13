@@ -50,7 +50,7 @@ namespace hotelier_core_app.API.Controllers
                 PerformedBy = _tokenHelper.GetUserFullName(Request),
                 IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
                 PerformerEmail = _tokenHelper.GetUserEmail(Request),
-                MacAddress = _tokenHelper.GetMacAddress(Request)
+                //MacAddress = _tokenHelper.GetMacAddress(Request)
             };
             BaseResponse response = await _policyGroupService.AddPolicyGroup(request, auditLog);
             return Ok(response);
@@ -89,7 +89,7 @@ namespace hotelier_core_app.API.Controllers
                 PerformedBy = _tokenHelper.GetUserFullName(Request),
                 IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
                 PerformerEmail = _tokenHelper.GetUserEmail(Request),
-                MacAddress = _tokenHelper.GetMacAddress(Request)
+                //MacAddress = _tokenHelper.GetMacAddress(Request)
             };
             BaseResponse response = await _policyGroupService.UpdatePolicyGroup(request, auditLog);
             return Ok(response);
@@ -99,7 +99,7 @@ namespace hotelier_core_app.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ValidationResultModel))]
-        public async Task<IActionResult> AddUserToPolicyGroup([FromQuery] long userId, [FromQuery] long policyGroupId)
+        public async Task<IActionResult> AddUserToPolicyGroup(AddUserToPolicyGroupDTO request)
         {
             AuditLog auditLog = new AuditLog
             {
@@ -108,9 +108,9 @@ namespace hotelier_core_app.API.Controllers
                 PerformedBy = _tokenHelper.GetUserFullName(Request),
                 IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
                 PerformerEmail = _tokenHelper.GetUserEmail(Request),
-                MacAddress = _tokenHelper.GetMacAddress(Request)
+                //MacAddress = _tokenHelper.GetMacAddress(Request)
             };
-            BaseResponse response = await _policyGroupService.AddUserToPolicyGroup(userId, policyGroupId, auditLog);
+            BaseResponse response = await _policyGroupService.AddUserToPolicyGroup(request, auditLog);
             return Ok(response);
         }
 
@@ -127,7 +127,7 @@ namespace hotelier_core_app.API.Controllers
                 PerformedBy = _tokenHelper.GetUserFullName(Request),
                 IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
                 PerformerEmail = _tokenHelper.GetUserEmail(Request),
-                MacAddress = _tokenHelper.GetMacAddress(Request)
+                //MacAddress = _tokenHelper.GetMacAddress(Request)
             };
             BaseResponse response = await _policyGroupService.RemoveUserFromPolicyGroup(userId, policyGroupId, auditLog);
             return Ok(response);
@@ -146,7 +146,7 @@ namespace hotelier_core_app.API.Controllers
                 PerformedBy = _tokenHelper.GetUserFullName(Request),
                 IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
                 PerformerEmail = _tokenHelper.GetUserEmail(Request),
-                MacAddress = _tokenHelper.GetMacAddress(Request)
+                //MacAddress = _tokenHelper.GetMacAddress(Request)
             };
             BaseResponse response = await _policyGroupService.AddPolicyToPolicyGroup(request, auditLog);
             return Ok(response);
@@ -156,7 +156,7 @@ namespace hotelier_core_app.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ValidationResultModel))]
-        public async Task<IActionResult> RemovePolicyFromPolicyGroup([FromQuery] long policyGroupId, [FromQuery] long moduleGroupId, [FromQuery] long policyId)
+        public async Task<IActionResult> RemovePolicyFromPolicyGroup(long policyGroupId, long policyId)
         {
             AuditLog auditLog = new AuditLog
             {
@@ -165,7 +165,7 @@ namespace hotelier_core_app.API.Controllers
                 PerformedBy = _tokenHelper.GetUserFullName(Request),
                 IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
                 PerformerEmail = _tokenHelper.GetUserEmail(Request),
-                MacAddress = _tokenHelper.GetMacAddress(Request)
+                //MacAddress = _tokenHelper.GetMacAddress(Request)
             };
             BaseResponse response = await _policyGroupService.RemovePolicyFromPolicyGroup(policyGroupId, policyId, auditLog);
             return Ok(response);

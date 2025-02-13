@@ -36,6 +36,8 @@ namespace hotelier_core_app.Service.AutoMapper
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => false));
             CreateMap<SubscriptionPlan, SubscriptionPlanResponseDTO>();
             CreateMap<Permission, PermissionDTO>();
+
+            CreateMap<PolicyGroup, GetPolicyGroupResponseDTO>();
         }
     }
 }

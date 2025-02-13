@@ -3,7 +3,7 @@
     public class AddPolicyToPolicyGroupDTO
     {
         public long PolicyGroupId { get; set; }
-        public long PolicyId { get; set; }
+        public long PermissionId { get; set; }
         public long ModuleGroupId { get; set; }
     }
 }

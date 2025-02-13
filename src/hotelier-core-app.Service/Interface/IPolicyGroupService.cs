@@ -10,11 +10,11 @@ namespace hotelier_core_app.Service.Interface
         Task<BaseResponse> AddPolicyGroup(AddPolicyGroupDTO request, AuditLog auditLog);
         Task<BaseResponse> UpdatePolicyGroup(UpdatePolicyGroupDTO request, AuditLog auditLog);
         // delete policy group (soft or not?)
-        Task<BaseResponse> AddUserToPolicyGroup(long userId, long policyGroupId, AuditLog auditLog);
+        Task<BaseResponse> AddUserToPolicyGroup(AddUserToPolicyGroupDTO request, AuditLog auditLog);
         Task<BaseResponse> RemoveUserFromPolicyGroup(long userId, long policyGroupId, AuditLog auditLog);
         Task<BaseResponse> AddPolicyToPolicyGroup(AddPolicyToPolicyGroupDTO request, AuditLog auditLog);
-        Task<BaseResponse> RemovePolicyFromPolicyGroup(long policyGroupId, long permissionId, AuditLog auditLog);
-        Task<BaseResponse<List<GetPolicyGroupsResponseDTO>>> GetPolicyGroups(GetPolicyGroupsRequestDTO request);
-        Task<BaseResponse<GetPolicyGroupsResponseDTO>> GetSinglePolicyGroup(long id);
+        Task<BaseResponse> RemovePolicyFromPolicyGroup(long policyGroupId, long policy, AuditLog auditLog);
+        Task<BaseResponse<List<GetPolicyGroupResponseDTO>>> GetPolicyGroups(GetPolicyGroupsRequestDTO request);
+        Task<BaseResponse<GetPolicyGroupResponseDTO>> GetSinglePolicyGroup(long id);
     }
 }

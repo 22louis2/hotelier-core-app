@@ -76,13 +76,14 @@ namespace hotelier_core_app.Service.Implementation
             policyGroup.Description = request.Description;
             policyGroup.TenantId = request.TenantId;
             policyGroup.CreatedBy = auditLog.PerformedBy;
-            policyGroup.CreationDate = DateTime.Now;
+            policyGroup.CreationDate = DateTime.UtcNow;
 
             _auditLogCommandRepository.Add(auditLog);
             _policyGroupCommandRepository.Add(policyGroup);
             _policyGroupCommandRepository.Save();
 
-            return BaseResponse.Success();
+            return BaseResponse.Success(ResponseMessages.OperationSuccessful,
+                ResponseStatusCode.OperationSuccessful);
         }
 
         public async Task<BaseResponse> UpdatePolicyGroup(UpdatePolicyGroupDTO request, AuditLog auditLog)
@@ -94,33 +95,35 @@ namespace hotelier_core_app.Service.Implementation
             policyGroup.Description = request.Description;
             policyGroup.TenantId= request.TenantId;
             policyGroup.ModifiedBy = auditLog.PerformerEmail;
-            policyGroup.LastModifiedDate = DateTime.Now;
+            policyGroup.LastModifiedDate = DateTime.UtcNow;
 
             _auditLogCommandRepository.Add(auditLog);
             _policyGroupCommandRepository.Update(policyGroup);
             _policyGroupCommandRepository.Save();
 
-            return BaseResponse.Success();
+            return BaseResponse.Success(ResponseMessages.OperationSuccessful,
+                ResponseStatusCode.OperationSuccessful);
         }
 
-        public async Task<BaseResponse> AddUserToPolicyGroup(long userId, long policyGroupId, AuditLog auditLog)
+        public async Task<BaseResponse> AddUserToPolicyGroup(AddUserToPolicyGroupDTO request, AuditLog auditLog)
         {
-            PolicyGroup policyGroup = await _policyGroupQueryRepository.FindAsync(policyGroupId);
+            PolicyGroup policyGroup = await _policyGroupQueryRepository.FindAsync(request.PolicyGroupId);
             if (policyGroup == null) return BaseResponse.Failure(ResponseMessages.PolicyGroupDoesNotExist);
 
-            var user = await _userManager.FindByIdAsync(userId.ToString());
+            var user = await _userManager.FindByIdAsync(request.UserId.ToString());
             if (user == null) return BaseResponse.Failure(ResponseMessages.UserDoesNotExist);
 
             var userPolicy = new ApplicationUserPolicyGroup();
-            userPolicy.UserId = userId;
-            userPolicy.PolicyGroupId = policyGroupId;
+            userPolicy.UserId = request.UserId;
+            userPolicy.PolicyGroupId = request.PolicyGroupId;
             userPolicy.CreatedBy = auditLog.PerformerEmail;
-            userPolicy.CreationDate = DateTime.Now;
+            userPolicy.CreationDate = DateTime.UtcNow;
 
             _auditLogCommandRepository.Add(auditLog);
             _userPolicyCommandRepository.Add(userPolicy);
+            await _userPolicyCommandRepository.SaveAsync();
 
-            return BaseResponse.Success();
+            return BaseResponse.Success(ResponseMessages.OperationSuccessful, ResponseStatusCode.OperationSuccessful);
         }
 
         public async Task<BaseResponse> RemoveUserFromPolicyGroup(long userId, long policyGroupId, AuditLog auditLog)
@@ -132,7 +135,7 @@ namespace hotelier_core_app.Service.Implementation
             _auditLogCommandRepository.Add(auditLog);
             _auditLogCommandRepository.Save();
 
-            return BaseResponse.Success();
+            return BaseResponse.Success(ResponseMessages.OperationSuccessful, ResponseStatusCode.OperationSuccessful);
         }
 
         public async Task<BaseResponse> AddPolicyToPolicyGroup(AddPolicyToPolicyGroupDTO request, AuditLog auditLog)
@@ -140,50 +143,52 @@ namespace hotelier_core_app.Service.Implementation
             PolicyGroup policyGroup = await _policyGroupQueryRepository.FindAsync(request.PolicyGroupId);
             if (policyGroup == null) return BaseResponse.Failure(ResponseMessages.PolicyGroupDoesNotExist);
 
-            var permission = await _permissionQueryRepository.FindAsync(request.PolicyId);
-            if(permission == null) return BaseResponse.Failure(ResponseMessages.PolicyDoesNotExist);
+            var permission = await _permissionQueryRepository.FindAsync(request.PermissionId);
+            if(permission == null) return BaseResponse.Failure(ResponseMessages.PermissionDoesNotExist);
 
             var moduleGroup = await _moduleGroupQueryRepository.FindAsync(request.ModuleGroupId);
             if (moduleGroup == null) return BaseResponse.Failure(ResponseMessages.ModuleGroupNotExist);
 
             var pmp = new PolicyModulePermission();
-            pmp.PermissionId = request.PolicyId;
+            pmp.PermissionId = request.PermissionId;
             pmp.PolicyGroupId = request.PolicyGroupId;
             pmp.ModuleGroupId = request.ModuleGroupId;
             pmp.CreatedBy = auditLog.PerformerEmail;
-            pmp.CreationDate = DateTime.Now;
+            pmp.CreationDate = DateTime.UtcNow;
 
             _auditLogCommandRepository.Add(auditLog);
             _pmpCommandRepository.Add(pmp);
             _pmpCommandRepository.Save();
 
-            return BaseResponse.Success();
+            return BaseResponse.Success(ResponseMessages.OperationSuccessful, ResponseStatusCode.OperationSuccessful);
         }
 
-        public async Task<BaseResponse> RemovePolicyFromPolicyGroup(long policyGroupId, long permissionId, AuditLog auditLog)
+        public async Task<BaseResponse> RemovePolicyFromPolicyGroup(long policyGroupId, long policy, AuditLog auditLog)
         {
-            var pmp = _pmpQueryRepository.GetByDefaultAsync(p => p.PermissionId == permissionId && p.PolicyGroupId == policyGroupId);
+            var pmp = await _pmpQueryRepository.GetByDefaultAsync(p => p.Id == policy && p.PolicyGroupId == policyGroupId);
             if (pmp == null) return BaseResponse.Failure(ResponseMessages.PolicyDoesNotExist);
 
             _auditLogCommandRepository.Add(auditLog);
             _pmpCommandRepository.Delete(pmp);
             _pmpCommandRepository.Save();
 
-            return BaseResponse.Success();
+            return BaseResponse.Success(ResponseMessages.OperationSuccessful, ResponseStatusCode.OperationSuccessful);
         }
 
-        public async Task<BaseResponse<List<GetPolicyGroupsResponseDTO>>> GetPolicyGroups(GetPolicyGroupsRequestDTO request)
+        public async Task<BaseResponse<List<GetPolicyGroupResponseDTO>>> GetPolicyGroups(GetPolicyGroupsRequestDTO request)
         {
-            var policyGroups = _policyGroupQueryRepository.GetAllIncluding(p => p.TenantId == request.TenantId, p => p.ModulePermissions);
-            var response = _mapper.Map<List<GetPolicyGroupsResponseDTO>>(policyGroups.ToList());
-            return BaseResponse<List<GetPolicyGroupsResponseDTO>>.Success(response);
+            var policyGroups = _policyGroupQueryRepository.GetAllIncluding(p => p.ModulePermissions).Where(p => p.TenantId == request.TenantId);
+            var response = _mapper.Map<List<GetPolicyGroupResponseDTO>>(policyGroups.ToList());
+            return BaseResponse<List<GetPolicyGroupResponseDTO>>.Success(response, ResponseMessages.OperationSuccessful,
+                ResponseStatusCode.OperationSuccessful);
         }
 
-        public async Task<BaseResponse<GetPolicyGroupsResponseDTO>> GetSinglePolicyGroup(long id)
+        public async Task<BaseResponse<GetPolicyGroupResponseDTO>> GetSinglePolicyGroup(long id)
         {
             PolicyGroup policyGroup = await _policyGroupQueryRepository.FindAsync(id);
-            if (policyGroup == null) return BaseResponse<GetPolicyGroupsResponseDTO>.Failure(null, ResponseMessages.PolicyGroupDoesNotExist);
-            return BaseResponse<GetPolicyGroupsResponseDTO>.Success(_mapper.Map<GetPolicyGroupsResponseDTO>(policyGroup));
+            if (policyGroup == null) return BaseResponse<GetPolicyGroupResponseDTO>.Failure(null, ResponseMessages.PolicyGroupDoesNotExist);
+            return BaseResponse<GetPolicyGroupResponseDTO>.Success(_mapper.Map<GetPolicyGroupResponseDTO>(policyGroup), ResponseMessages.OperationSuccessful,
+                ResponseStatusCode.OperationSuccessful);
         }
     }
 }
