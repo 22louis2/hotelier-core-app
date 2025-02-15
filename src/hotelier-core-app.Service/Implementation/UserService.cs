@@ -144,7 +144,7 @@ namespace hotelier_core_app.Service.Implementation
             _auditLogCommandRepository.SwitchProvider(DBProvider.SQL_Dapper);
             await _auditLogCommandRepository.AddAsync(auditLog);
 
-            //await SendEmailConfirmationAsync(newUser, model.Email);
+            await SendEmailConfirmationAsync(newUser, model.Email);
 
             await CreateTenantAsync(model, newUser);
 
@@ -308,7 +308,7 @@ namespace hotelier_core_app.Service.Implementation
             {
                 Name = model.HotelName,
                 Description = $"Tenant for {model.HotelName}",
-                Logo = "",
+                Logo = string.Empty,
                 SubscriptionPlanId = model.SubscriptionPlanId,
                 CreatedBy = newUser.Id.ToString(),
                 CreationDate = DateTime.UtcNow

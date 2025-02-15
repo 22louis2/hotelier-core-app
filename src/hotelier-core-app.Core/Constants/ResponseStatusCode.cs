@@ -65,5 +65,9 @@
 
         // Policy Management
         public const string PolicyGroupExists = "049";
+        public const string PolicyGroupDoesNotExist = "049";
+        public const string UserNotInPolicyGroup = "050";
+        public const string PermissionDoesNotExist = "051";
+        public const string PolicyDoesNotExist = "052";
     }
 }

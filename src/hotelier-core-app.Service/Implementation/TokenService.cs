@@ -184,10 +184,7 @@ namespace hotelier_core_app.Service.Implementation
         /// <exception cref="ArgumentException"></exception>
         private static string GetHeaderValue(HttpRequest request, string headerName)
         {
-            if (request?.Headers == null || !request.Headers.TryGetValue(headerName, out StringValues value))
-            {
-                throw new ArgumentException($"{headerName} header is missing or the request is invalid.");
-            }
+            request.Headers.TryGetValue(headerName, out StringValues value);
 
             return value.ToString();
         }

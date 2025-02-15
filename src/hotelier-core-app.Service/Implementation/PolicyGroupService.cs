@@ -69,7 +69,7 @@ namespace hotelier_core_app.Service.Implementation
             }
 
             var currentUser = await _userManager.FindByEmailAsync(auditLog.PerformerEmail);
-            if (currentUser == null) return BaseResponse.Failure(ResponseMessages.UserDoesNotExist);
+            if (currentUser == null) return BaseResponse.Failure(ResponseMessages.UserDoesNotExist, ResponseStatusCode.UserDoesNotExist);
 
             policyGroup = new PolicyGroup();
             policyGroup.Name = request.Name;
@@ -89,7 +89,7 @@ namespace hotelier_core_app.Service.Implementation
         public async Task<BaseResponse> UpdatePolicyGroup(UpdatePolicyGroupDTO request, AuditLog auditLog)
         {
             PolicyGroup policyGroup = await _policyGroupQueryRepository.FindAsync(request.Id);
-            if (policyGroup == null) return BaseResponse.Failure(ResponseMessages.PolicyGroupDoesNotExist);
+            if (policyGroup == null) return BaseResponse.Failure(ResponseMessages.PolicyGroupDoesNotExist, ResponseStatusCode.PolicyGroupDoesNotExist);
             
             policyGroup.Name = request.Name;
             policyGroup.Description = request.Description;
@@ -108,10 +108,10 @@ namespace hotelier_core_app.Service.Implementation
         public async Task<BaseResponse> AddUserToPolicyGroup(AddUserToPolicyGroupDTO request, AuditLog auditLog)
         {
             PolicyGroup policyGroup = await _policyGroupQueryRepository.FindAsync(request.PolicyGroupId);
-            if (policyGroup == null) return BaseResponse.Failure(ResponseMessages.PolicyGroupDoesNotExist);
+            if (policyGroup == null) return BaseResponse.Failure(ResponseMessages.PolicyGroupDoesNotExist, ResponseStatusCode.PolicyGroupDoesNotExist);
 
             var user = await _userManager.FindByIdAsync(request.UserId.ToString());
-            if (user == null) return BaseResponse.Failure(ResponseMessages.UserDoesNotExist);
+            if (user == null) return BaseResponse.Failure(ResponseMessages.UserDoesNotExist, ResponseStatusCode.UserDoesNotExist);
 
             var userPolicy = new ApplicationUserPolicyGroup();
             userPolicy.UserId = request.UserId;
@@ -129,7 +129,7 @@ namespace hotelier_core_app.Service.Implementation
         public async Task<BaseResponse> RemoveUserFromPolicyGroup(long userId, long policyGroupId, AuditLog auditLog)
         {
             var userPolicy = await _userPolicyQueryRepository.GetByDefaultAsync(u => u.UserId == userId && u.PolicyGroupId == policyGroupId);
-            if(userPolicy == null) return BaseResponse.Failure(ResponseMessages.UserNotInPolicyGroup);
+            if(userPolicy == null) return BaseResponse.Failure(ResponseMessages.UserNotInPolicyGroup, ResponseStatusCode.UserNotInPolicyGroup);
 
             _userPolicyCommandRepository.Delete(userPolicy);
             _auditLogCommandRepository.Add(auditLog);
@@ -141,13 +141,13 @@ namespace hotelier_core_app.Service.Implementation
         public async Task<BaseResponse> AddPolicyToPolicyGroup(AddPolicyToPolicyGroupDTO request, AuditLog auditLog)
         {
             PolicyGroup policyGroup = await _policyGroupQueryRepository.FindAsync(request.PolicyGroupId);
-            if (policyGroup == null) return BaseResponse.Failure(ResponseMessages.PolicyGroupDoesNotExist);
+            if (policyGroup == null) return BaseResponse.Failure(ResponseMessages.PolicyGroupDoesNotExist, ResponseStatusCode.PolicyGroupDoesNotExist);
 
             var permission = await _permissionQueryRepository.FindAsync(request.PermissionId);
-            if(permission == null) return BaseResponse.Failure(ResponseMessages.PermissionDoesNotExist);
+            if(permission == null) return BaseResponse.Failure(ResponseMessages.PermissionDoesNotExist, ResponseStatusCode.PermissionDoesNotExist);
 
             var moduleGroup = await _moduleGroupQueryRepository.FindAsync(request.ModuleGroupId);
-            if (moduleGroup == null) return BaseResponse.Failure(ResponseMessages.ModuleGroupNotExist);
+            if (moduleGroup == null) return BaseResponse.Failure(ResponseMessages.ModuleGroupNotExist, ResponseStatusCode.ModuleGroupNotExist);
 
             var pmp = new PolicyModulePermission();
             pmp.PermissionId = request.PermissionId;
@@ -166,7 +166,7 @@ namespace hotelier_core_app.Service.Implementation
         public async Task<BaseResponse> RemovePolicyFromPolicyGroup(long policyGroupId, long policy, AuditLog auditLog)
         {
             var pmp = await _pmpQueryRepository.GetByDefaultAsync(p => p.Id == policy && p.PolicyGroupId == policyGroupId);
-            if (pmp == null) return BaseResponse.Failure(ResponseMessages.PolicyDoesNotExist);
+            if (pmp == null) return BaseResponse.Failure(ResponseMessages.PolicyDoesNotExist, ResponseStatusCode.PolicyDoesNotExist);
 
             _auditLogCommandRepository.Add(auditLog);
             _pmpCommandRepository.Delete(pmp);
@@ -186,7 +186,7 @@ namespace hotelier_core_app.Service.Implementation
         public async Task<BaseResponse<GetPolicyGroupResponseDTO>> GetSinglePolicyGroup(long id)
         {
             PolicyGroup policyGroup = await _policyGroupQueryRepository.FindAsync(id);
-            if (policyGroup == null) return BaseResponse<GetPolicyGroupResponseDTO>.Failure(null, ResponseMessages.PolicyGroupDoesNotExist);
+            if (policyGroup == null) return BaseResponse<GetPolicyGroupResponseDTO>.Failure(null, ResponseMessages.PolicyGroupDoesNotExist, ResponseStatusCode.PolicyGroupDoesNotExist);
             return BaseResponse<GetPolicyGroupResponseDTO>.Success(_mapper.Map<GetPolicyGroupResponseDTO>(policyGroup), ResponseMessages.OperationSuccessful,
                 ResponseStatusCode.OperationSuccessful);
         }

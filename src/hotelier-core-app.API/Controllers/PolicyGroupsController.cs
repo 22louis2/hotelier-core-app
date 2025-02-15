@@ -10,7 +10,7 @@ using System.Net;
 
 namespace hotelier_core_app.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class PolicyGroupsController : ControllerBase
     {
@@ -50,7 +50,7 @@ namespace hotelier_core_app.API.Controllers
                 PerformedBy = _tokenHelper.GetUserFullName(Request),
                 IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
                 PerformerEmail = _tokenHelper.GetUserEmail(Request),
-                //MacAddress = _tokenHelper.GetMacAddress(Request)
+                MacAddress = _tokenHelper.GetMacAddress(Request)
             };
             BaseResponse response = await _policyGroupService.AddPolicyGroup(request, auditLog);
             return Ok(response);
@@ -89,7 +89,7 @@ namespace hotelier_core_app.API.Controllers
                 PerformedBy = _tokenHelper.GetUserFullName(Request),
                 IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
                 PerformerEmail = _tokenHelper.GetUserEmail(Request),
-                //MacAddress = _tokenHelper.GetMacAddress(Request)
+                MacAddress = _tokenHelper.GetMacAddress(Request)
             };
             BaseResponse response = await _policyGroupService.UpdatePolicyGroup(request, auditLog);
             return Ok(response);
@@ -108,7 +108,7 @@ namespace hotelier_core_app.API.Controllers
                 PerformedBy = _tokenHelper.GetUserFullName(Request),
                 IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
                 PerformerEmail = _tokenHelper.GetUserEmail(Request),
-                //MacAddress = _tokenHelper.GetMacAddress(Request)
+                MacAddress = _tokenHelper.GetMacAddress(Request)
             };
             BaseResponse response = await _policyGroupService.AddUserToPolicyGroup(request, auditLog);
             return Ok(response);
@@ -127,7 +127,7 @@ namespace hotelier_core_app.API.Controllers
                 PerformedBy = _tokenHelper.GetUserFullName(Request),
                 IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
                 PerformerEmail = _tokenHelper.GetUserEmail(Request),
-                //MacAddress = _tokenHelper.GetMacAddress(Request)
+                MacAddress = _tokenHelper.GetMacAddress(Request)
             };
             BaseResponse response = await _policyGroupService.RemoveUserFromPolicyGroup(userId, policyGroupId, auditLog);
             return Ok(response);
@@ -146,7 +146,7 @@ namespace hotelier_core_app.API.Controllers
                 PerformedBy = _tokenHelper.GetUserFullName(Request),
                 IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
                 PerformerEmail = _tokenHelper.GetUserEmail(Request),
-                //MacAddress = _tokenHelper.GetMacAddress(Request)
+                MacAddress = _tokenHelper.GetMacAddress(Request)
             };
             BaseResponse response = await _policyGroupService.AddPolicyToPolicyGroup(request, auditLog);
             return Ok(response);
@@ -165,7 +165,7 @@ namespace hotelier_core_app.API.Controllers
                 PerformedBy = _tokenHelper.GetUserFullName(Request),
                 IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
                 PerformerEmail = _tokenHelper.GetUserEmail(Request),
-                //MacAddress = _tokenHelper.GetMacAddress(Request)
+                MacAddress = _tokenHelper.GetMacAddress(Request)
             };
             BaseResponse response = await _policyGroupService.RemovePolicyFromPolicyGroup(policyGroupId, policyId, auditLog);
             return Ok(response);
