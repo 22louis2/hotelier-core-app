@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace hotelier_core_app.Model.DTOs.Request;
 
-public class CreateSubscriptionPlanDto
+public class CreateSubscriptionPlanDTO
 {
     [Required, StringLength(50)]
     public string Name { get; set; }

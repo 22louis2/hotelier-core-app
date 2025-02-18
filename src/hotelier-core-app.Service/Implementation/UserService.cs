@@ -308,6 +308,7 @@ namespace hotelier_core_app.Service.Implementation
             {
                 Name = model.HotelName,
                 Description = $"Tenant for {model.HotelName}",
+                Logo = string.Empty,
                 SubscriptionPlanId = model.SubscriptionPlanId,
                 CreatedBy = newUser.Id.ToString(),
                 CreationDate = DateTime.UtcNow

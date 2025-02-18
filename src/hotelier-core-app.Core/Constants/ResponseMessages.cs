@@ -67,5 +67,12 @@
         public const string SubscriptionUpdated = "Subscription updated successfully";
         public const string SubscriptionRemoved = "Subscription removed successfully";
         public const string Subscribed = "Subscribed to plan successfully";
+
+        // Policy Group Management
+        public const string PolicyGroupExists = "A policy with this name already exists for this tenant";
+        public const string PolicyGroupDoesNotExist = "The specified policy group does not exist";
+        public const string UserNotInPolicyGroup = "The user is not in the specified policy group";
+        public const string PermissionDoesNotExist = "The specified permission does not exist";
+        public const string PolicyDoesNotExist = "The specified policy does not exist";
     }
 }

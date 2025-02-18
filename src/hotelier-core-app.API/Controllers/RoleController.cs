@@ -30,7 +30,7 @@ public class RoleController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
     [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ValidationResultModel))]
-    public async Task<IActionResult> CreateRole(CreateRoleRequestDto request)
+    public async Task<IActionResult> CreateRole(CreateRoleRequestDTO request)
     {
         AuditLog auditLog = new AuditLog
         {
@@ -51,7 +51,7 @@ public class RoleController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
     [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ValidationResultModel))]
-    public async Task<IActionResult> UpdateRole(UpdateRoleRequestDto request)
+    public async Task<IActionResult> UpdateRole(UpdateRoleRequestDTO request)
     {
         AuditLog auditLog = new AuditLog
         {
@@ -69,7 +69,7 @@ public class RoleController : ControllerBase
     }
     
     [HttpGet("{id}")]
-    [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse<RoleResponseDto>))]
+    [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse<RoleResponseDTO>))]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
     public async Task<IActionResult> GetRoleById(long id)
     {
@@ -78,7 +78,7 @@ public class RoleController : ControllerBase
     }
     
     [HttpGet()]
-    [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(PageBaseResponse<List<RoleResponseDto>>))]
+    [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(PageBaseResponse<List<RoleResponseDTO>>))]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
     public async Task<IActionResult> GetAllRoles()
     {

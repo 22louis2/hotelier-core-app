@@ -33,7 +33,7 @@ public class SubscriptionService : ISubscriptionService
         this._auditLogCommandRepository = auditLogCommandRepository;
         this._mapper = mapper;
     }
-    public async Task<BaseResponse> CreateSubscriptionPlanAsync(CreateSubscriptionPlanDto request, AuditLog auditLog)
+    public async Task<BaseResponse> CreateSubscriptionPlanAsync(CreateSubscriptionPlanDTO request, AuditLog auditLog)
     {
         var existingPlan = await _planQueryRepository.GetByDefaultAsync(p => p.Name == request.Name && p.IsDeleted == false);
         if (existingPlan != null)
@@ -49,22 +49,22 @@ public class SubscriptionService : ISubscriptionService
         return BaseResponse.Success(ResponseMessages.SubscriptionCreated);
     }
 
-    public async Task<BaseResponse<SubscriptionPlanResponseDto>> GetSubscriptionPlanByIdAsync(long id)
+    public async Task<BaseResponse<SubscriptionPlanResponseDTO>> GetSubscriptionPlanByIdAsync(long id)
     {
         var plan = await _planQueryRepository.FindAsync(id);
         Console.WriteLine(plan.ToString());
         if (plan == null)
-            return BaseResponse<SubscriptionPlanResponseDto>.Failure(null, ResponseMessages.SubscriptionNotExist);
+            return BaseResponse<SubscriptionPlanResponseDTO>.Failure(null, ResponseMessages.SubscriptionNotExist);
 
-        var response = _mapper.Map<SubscriptionPlanResponseDto>(plan);
-        return BaseResponse<SubscriptionPlanResponseDto>.Success(response);
+        var response = _mapper.Map<SubscriptionPlanResponseDTO>(plan);
+        return BaseResponse<SubscriptionPlanResponseDTO>.Success(response);
     }
 
-    public async Task<BaseResponse<List<SubscriptionPlanResponseDto>>> GetAllSubscriptionPlansAsync()
+    public async Task<BaseResponse<List<SubscriptionPlanResponseDTO>>> GetAllSubscriptionPlansAsync()
     {
         var plans = await _planQueryRepository.GetAllAsync();
-        var response =  _mapper.Map<List<SubscriptionPlanResponseDto>>(plans);
-        return BaseResponse<List<SubscriptionPlanResponseDto>>.Success(response);
+        var response =  _mapper.Map<List<SubscriptionPlanResponseDTO>>(plans);
+        return BaseResponse<List<SubscriptionPlanResponseDTO>>.Success(response);
     }
 
     public async Task<BaseResponse> DeleteSubscriptionPlanAsync(long id, AuditLog auditLog)
@@ -84,7 +84,7 @@ public class SubscriptionService : ISubscriptionService
     }
 
 
-    public async Task<BaseResponse> AssignSubscriptionPlanToTenantAsync(AssignSubscriptionPlanDto request,
+    public async Task<BaseResponse> AssignSubscriptionPlanToTenantAsync(AssignSubscriptionPlanDTO request,
         AuditLog auditLog)
     {
         var tenant = await _tenantQueryRepository.FindAsync(request.TenantId);
