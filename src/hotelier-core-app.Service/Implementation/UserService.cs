@@ -239,9 +239,71 @@ namespace hotelier_core_app.Service.Implementation
                 ResponseStatusCode.LoginSuccessful), refreshToken);
         }
 
-        public Task<BaseResponse> ReassignRole(EditUserRolesRequestDTO model, AuditLog auditLog)
+        public async Task<BaseResponse> ReassignRole(EditUserRolesRequestDTO model, AuditLog auditLog)
         {
-            throw new NotImplementedException();
+            ApplicationUser? user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user != null)
+            {
+                if (user.IsActive)
+                {
+                    List<string> validRoles = new List<string>();
+
+                    foreach (var role in model.Roles) {
+                        if (!await _roleManager.RoleExistsAsync(role))
+                        {
+                            return BaseResponse.Failure(ResponseMessages.RoleNotExist, ResponseStatusCode.RoleNotExist); ;
+                        }
+                    }
+
+                    var currentRoles = await _userManager.GetRolesAsync(user);
+
+                    // find matching roles
+                    // if found, mark for exclusion from deletion
+                    // check if any changes exists for the role reassignment
+
+                    //if (currentRoles.Contains(newRole))
+                    //{
+                    //    return true;
+                    //}
+
+                    /*
+                        ApplicationUserRole userRole = await _userRoleQueryRepository.GetByDefaultAsync(predicate => predicate.UserId == user.Id);
+                        userRole.RoleId = model.RoleId;
+                        _userRoleCommandRepository.Update(userRole);
+                        _auditLogCommandRepository.Add(auditLog);
+
+                        await _userRoleCommandRepository.SaveAsync();
+                        await _auditLogCommandRepository.SaveAsync();
+
+                        return BaseResponse.Success(ResponseMessages.UpdateSuccessful);
+                    }
+
+                            */
+
+
+                    //var currentRoles = await _userManager.GetRolesAsync(user);
+
+                    //// Remove old roles
+                    //var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                    //if (!removeResult.Succeeded)
+                    //{
+                    //    _logger.LogError($"Failed to remove existing roles for user {user.Email}.");
+                    //    return false;
+                    //}
+
+                    //// Assign new role
+                    //var addResult = await _userManager.AddToRoleAsync(user, newRole);
+                    //if (!addResult.Succeeded)
+                    //{
+                    //    _logger.LogError($"Failed to add role {newRole} to user {user.Email}.");
+                    //    return false;
+                    //}
+
+                    return BaseResponse.Failure(ResponseMessages.UserInactive);
+                }
+            }
+            return BaseResponse.Failure(ResponseMessages.UserDoesNotExist);
         }
 
         public async Task<(BaseResponse<RefreshTokenResponseDTO>, string)> RefreshToken(RefreshTokenRequestDTO model, AuditLog auditLog)
@@ -277,9 +339,26 @@ namespace hotelier_core_app.Service.Implementation
             throw new NotImplementedException();
         }
 
-        public Task<BaseResponse> UpdateUserName(EditUserNameRequestDTO model, AuditLog auditLog)
+        public async Task<BaseResponse> UpdateUserName(EditUserNameRequestDTO model, AuditLog auditLog)
         {
-            throw new NotImplementedException();
+            ApplicationUser? user = await _userManager.FindByEmailAsync(model.Email);
+            if (user != null)
+            {
+                if (user.IsActive)
+                {
+                    user.FullName = model.Name;
+                    user.LastModifiedDate = DateTime.UtcNow;
+                    user.ModifiedBy = auditLog.PerformedBy;
+                    await _userManager.UpdateAsync(user);
+
+                    _auditLogCommandRepository.Add(auditLog);
+                    await _auditLogCommandRepository.SaveAsync();
+
+                    return BaseResponse.Success(ResponseMessages.UpdateSuccessful, ResponseStatusCode.UpdateSuccessful);
+                }
+                return BaseResponse.Failure(ResponseMessages.UserInactive, ResponseStatusCode.UserInactive);
+            }
+            return BaseResponse.Failure(ResponseMessages.UserDoesNotExist, ResponseStatusCode.UserDoesNotExist);
         }
 
         #region private methods
