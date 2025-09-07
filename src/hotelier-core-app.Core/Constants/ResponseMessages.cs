@@ -36,12 +36,15 @@
         public const string LoginSuccessful = "Login successful";
         public const string CantVerifyToken = "Can't Verify Token";
         public const string CantVerifyRefreshToken = "Can't Verify Refresh Token";
+        public const string UsersRetrieved = "Users Retrieved successfully";
+        public const string UsersFetchFailed = "User Fetch Failed";
 
         //User Role
         public const string RoleExist = "Role with this name already exist";
         public const string RoleNotExist = "This role does not already exist";
         public const string RoleCreated = "Role created successfully";
         public const string RoleUpdated = "Role updated successfully";
+        public const string RoleReassignmentError = "Role reassignment error";
 
         //Module Service
         public const string ModuleGroupUpdated = "Dashboard detail is updated";
@@ -53,6 +56,7 @@
         public const string ModuleExist = "Module already exist";
         public const string ModuleUpdateValidation = "Either of the module field is required";
         public const string NoModuleAccess = "No module access found for user";
+        public const string ModulesRetrieved = "Modules Retrieved successfully";
 
         public const string EmailSent = "An email has been successfully sent to the user";
         public const string EmailFailed = "Failed to send the email. Please try again later";

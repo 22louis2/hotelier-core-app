@@ -69,5 +69,10 @@
         public const string UserNotInPolicyGroup = "050";
         public const string PermissionDoesNotExist = "051";
         public const string PolicyDoesNotExist = "052";
+        
+        public const string UserFetchedSuccessfully = "053";
+        public const string UsersFetchFailed = "054";
+        public const string UsersRetrieved = "055";
+        public const string ModulesRetrieved = "056";
     }
 }

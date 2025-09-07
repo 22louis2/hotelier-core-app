@@ -14,6 +14,7 @@
         public const string CreateUserRole = "Create User Role";
         public const string EditUserRole = "Edit User Role";
         public const string DeleteUserRole = "Delete User Role";
+        public const string ReassignRole = "Reassign Role";
 
         //Module Management
         public const string CreateModuleGroup = "Create Module Group";

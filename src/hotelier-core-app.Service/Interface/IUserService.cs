@@ -26,6 +26,6 @@ namespace hotelier_core_app.Service.Interface
 
         Task<BaseResponse<ApplicationUserDTO>> GetUserByEmail(string email);
 
-        BaseResponse<List<ModuleGroupDTO>> GetAssignedModules(string emailAddress);
+        Task<BaseResponse<List<ModuleGroupDTO>>> GetAssignedModules(string emailAddress);
     }
 }
