@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace hotelier_core_app.Service.Implementation
 {
@@ -40,6 +41,7 @@ namespace hotelier_core_app.Service.Implementation
         private readonly string _clientUrl;
         private const string HOTELIER_ADMIN = "Hotelier Admin";
         private const string HOTELIER_ADMIN_EMAIL = "admin@hotelier.com";
+        private readonly IModuleService _moduleService;
 
         public UserService(
             UserManager<ApplicationUser> userManager,
@@ -49,7 +51,8 @@ namespace hotelier_core_app.Service.Implementation
             IDBCommandRepository<Tenant> tenantCommandRepository,
             IEmailService emailService,
             IMapper mapper,
-            IConfiguration config)
+            IConfiguration config,
+            IModuleService moduleService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -59,6 +62,7 @@ namespace hotelier_core_app.Service.Implementation
             _emailService = emailService;
             _mapper = mapper;
             _clientUrl = config.GetSection("Client:ClientURI").Value ?? string.Empty;
+            _moduleService = moduleService;
         }
 
         public async Task<BaseResponse> ActivateUser(ActivateUserRequestDTO model, AuditLog auditLog)
@@ -209,19 +213,50 @@ namespace hotelier_core_app.Service.Implementation
             return BaseResponse.Failure(ResponseMessages.OperationFailed, ResponseStatusCode.OperationFailed);
         }
 
-        public BaseResponse<List<ModuleGroupDTO>> GetAssignedModules(string emailAddress)
+        public async Task<BaseResponse<List<ModuleGroupDTO>>> GetAssignedModules(string emailAddress)
         {
-            throw new NotImplementedException();
+            var user = await _userManager.FindByEmailAsync(emailAddress);
+            if (user == null)
+            {
+                return BaseResponse<List<ModuleGroupDTO>>.Failure(new List<ModuleGroupDTO>(), ResponseMessages.UserDoesNotExist, ResponseStatusCode.UserDoesNotExist);
+            }
+            var userRoles = await _userManager.GetRolesAsync(user);
+            
+            var modules = _moduleService.GetAssignedModulesAsync(userRoles.ToList());
+            return BaseResponse<List<ModuleGroupDTO>>.Success(modules.Data, ResponseMessages.ModulesRetrieved, ResponseStatusCode.ModulesRetrieved);
         }
 
-        public Task<BaseResponse<ApplicationUserDTO>> GetUserByEmail(string email)
+        public async Task<BaseResponse<ApplicationUserDTO>> GetUserByEmail(string email)
         {
-            throw new NotImplementedException();
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return BaseResponse<ApplicationUserDTO>.Failure( new ApplicationUserDTO(),
+                    ResponseMessages.UserDoesNotExist, ResponseStatusCode.UserDoesNotExist);
+            }
+
+            var userResponse = _mapper.Map<ApplicationUserDTO>(user);
+            return BaseResponse<ApplicationUserDTO>.Success(userResponse);
         }
 
-        public Task<PageBaseResponse<List<ApplicationUserDTO>>> GetUsers(PageParamsDTO model)
+        public async Task<PageBaseResponse<List<ApplicationUserDTO>>> GetUsers(PageParamsDTO model)
         {
-            throw new NotImplementedException();
+            var usersQuery =  _userManager.Users.Where(u => !u.IsDeleted);
+            var totalUsers = await usersQuery.CountAsync();
+            if (totalUsers == 0)
+            {
+                return PageBaseResponse<List<ApplicationUserDTO>>.Failure(new List<ApplicationUserDTO>(),
+                    ResponseMessages.UsersFetchFailed, 0, ResponseStatusCode.UsersFetchFailed);
+            }
+            
+            var users = await usersQuery
+                .Skip((model.PageNumber - 1) * model.PageSize)
+                .Take(model.PageSize)
+                .ToListAsync();
+            
+            var usersResponse = _mapper.Map<List<ApplicationUserDTO>>(users);
+            
+            return PageBaseResponse<List<ApplicationUserDTO>>.Success(usersResponse, ResponseMessages.UsersRetrieved, totalUsers, ResponseStatusCode.UsersRetrieved);
         }
 
         public async Task<(BaseResponse<LoginResponseDTO>, string)> Login(UserLoginRequestDTO model, AuditLog auditLog)
@@ -308,6 +343,21 @@ namespace hotelier_core_app.Service.Implementation
                     }
 
                     var currentRoles = await _userManager.GetRolesAsync(user);
+                    
+                    var removeUserFromRole = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                    if (!removeUserFromRole.Succeeded)
+                    {
+                        return BaseResponse.Failure(ResponseMessages.RoleReassignmentError, ResponseStatusCode.GeneralError);
+                    }
+                    
+                    var addUserToRole = await _userManager.AddToRolesAsync(user, model.Roles);
+                    if (!addUserToRole.Succeeded)
+                    {
+                        return BaseResponse.Failure(ResponseMessages.RoleReassignmentError, ResponseStatusCode.GeneralError);
+                    }
+                    
+                    await _auditLogCommandRepository.AddAsync(auditLog);
+                    await _auditLogCommandRepository.SaveAsync();
 
                     // find matching roles
                     // if found, mark for exclusion from deletion
@@ -351,11 +401,9 @@ namespace hotelier_core_app.Service.Implementation
                     //    return false;
                     //}
 
+                    return BaseResponse.Success(ResponseMessages.RoleUpdated);
                 }
-                else
-                {
-                    return BaseResponse.Failure(ResponseMessages.UserInactive, ResponseStatusCode.UserInactive);
-                }
+                return BaseResponse.Failure(ResponseMessages.UserInactive);
             }
             return BaseResponse.Failure(ResponseMessages.UserDoesNotExist);
         }

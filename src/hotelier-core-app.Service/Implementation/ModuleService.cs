@@ -234,5 +234,23 @@ namespace hotelier_core_app.Service.Implementation
 
             return BaseResponse<List<ModuleGroupDTO>>.Success(modulesGroupDTO, ResponseMessages.OperationSuccessful);
         }
+        
+        
+        public BaseResponse<List<ModuleGroupDTO>> GetAssignedModulesAsync(List<string> roles)
+        {
+            if (roles == null || !roles.Any())
+            {
+                return BaseResponse<List<ModuleGroupDTO>>.Failure(null, "No roles provided.");
+            }
+
+            var allModuleGroups = _moduleGroupQueryRepository.GetAllIncluding(group => group.Modules).ToList();
+            var filteredModuleGroups = allModuleGroups
+                .Where(group => group.Modules.Any())
+                .ToList();
+
+            var result = _mapper.Map<List<ModuleGroupDTO>>(filteredModuleGroups);
+
+            return BaseResponse<List<ModuleGroupDTO>>.Success(result, ResponseMessages.OperationSuccessful);
+        }
     }
 }
