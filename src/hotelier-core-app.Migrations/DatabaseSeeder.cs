@@ -4,8 +4,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace hotelier_core_app.Migrations
 {
+    /// <summary>
+    /// Provides methods for seeding the database with initial data and migrations.
+    /// </summary>
     public class DatabaseSeeder
     {
+        /// <summary>
+        /// Seeds the database with initial data and applies pending migrations.
+        /// </summary>
+        /// <param name="provider">The service provider for dependency resolution.</param>
         public async static Task Seeder(IServiceProvider provider)
         {
             using var scope = provider.CreateScope();
@@ -109,7 +116,7 @@ namespace hotelier_core_app.Migrations
                 await context.Permission.AddRangeAsync(permissions);
             }
 
-            if(!context.SubscriptionPlans.Any())
+            if (!context.SubscriptionPlans.Any())
             {
                 await context.AddRangeAsync(subscriptions);
             }

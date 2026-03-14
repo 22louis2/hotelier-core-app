@@ -5,8 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace hotelier_core_app.Migrations
 {
+    /// <summary>
+    /// Entity Framework Core database context for the hotelier-core-app, supporting multi-tenancy.
+    /// </summary>
     public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, long, ApplicationUserClaim, ApplicationUserRole, ApplicationUserLogin, IdentityRoleClaim<long>, ApplicationUserToken>
     {
+        private ITenantProvider _tenantProvider;
+
         public DbSet<Address> Addresses { get; set; }
         public DbSet<ApplicationUserPolicyGroup> UserPolicyGroups { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
@@ -25,17 +30,30 @@ namespace hotelier_core_app.Migrations
         public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
         public DbSet<Tenant> Tenants { get; set; }
 
-        public AppDbContext()
-        {
-        }
-
-        public AppDbContext(DbContextOptions<AppDbContext> options)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AppDbContext"/> class.
+        /// </summary>
+        /// <param name="options">The database context options.</param>
+        /// <param name="tenantProvider">The tenant provider for multi-tenancy.</param>
+        public AppDbContext(DbContextOptions<AppDbContext> options, ITenantProvider tenantProvider)
             : base(options)
         {
+            _tenantProvider = tenantProvider;
         }
 
+        /// <summary>
+        /// Configures the model and sets the schema for multi-tenancy.
+        /// </summary>
+        /// <param name="modelBuilder">The model builder.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            var schema = _tenantProvider?.GetSchema() ?? "public";
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                // Set schema for all entities
+                entityType.SetSchema(schema);
+            }
+
             modelBuilder.Entity<ApplicationUser>()
                 .Property(u => u.RowVersion)
                 .IsRequired()

@@ -5,6 +5,8 @@ VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hotelier-core-app.API", "src\hotelier-core-app.API\hotelier-core-app.API.csproj", "{82BB1AA7-ADA8-42AC-90EA-CAB423AD5392}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hotelier-core-app.Test", "src\hotelier-core-app.Test\hotelier-core-app.Test.csproj", "{B1B1B1B1-B1B1-4B1B-B1B1-B1B1B1B1B1B1}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hotelier-core-app.Repository", "src\hotelier-core-app.Repository\hotelier-core-app.Repository.csproj", "{AABBF212-8AB1-478E-8018-49C3E3A88E7E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hotelier-core-app.Core", "src\hotelier-core-app.Core\hotelier-core-app.Core.csproj", "{4C424A6B-D638-4BDF-A372-9AB6F2A3FAC2}"
@@ -31,6 +33,10 @@ Global
 		{82BB1AA7-ADA8-42AC-90EA-CAB423AD5392}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82BB1AA7-ADA8-42AC-90EA-CAB423AD5392}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82BB1AA7-ADA8-42AC-90EA-CAB423AD5392}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1B1B1B1-B1B1-4B1B-B1B1-B1B1B1B1B1B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1B1B1B1-B1B1-4B1B-B1B1-B1B1B1B1B1B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1B1B1B1-B1B1-4B1B-B1B1-B1B1B1B1B1B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1B1B1B1-B1B1-4B1B-B1B1-B1B1B1B1B1B1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AABBF212-8AB1-478E-8018-49C3E3A88E7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AABBF212-8AB1-478E-8018-49C3E3A88E7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AABBF212-8AB1-478E-8018-49C3E3A88E7E}.Release|Any CPU.ActiveCfg = Release|Any CPU

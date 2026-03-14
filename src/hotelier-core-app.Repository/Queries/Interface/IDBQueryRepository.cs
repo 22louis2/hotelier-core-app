@@ -20,7 +20,7 @@ namespace hotelier_core_app.Domain.Queries.Interface
 
         TEntity GetByDefault(Expression<Func<TEntity, bool>> predicate, string connectionString);
 
-        Task<TEntity> GetByDefaultAsync(Expression<Func<TEntity, bool>> predicate, string connectionString);
+        Task<TEntity?> GetByDefaultAsync(Expression<Func<TEntity, bool>> predicate, string connectionString);
 
         bool IsExist(Expression<Func<TEntity, bool>> predicate, string connectionString);
 

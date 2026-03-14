@@ -1,5 +1,8 @@
 ﻿namespace hotelier_core_app.Core.Constants
 {
+    /// <summary>
+    /// Contains standard response messages used throughout the application.
+    /// </summary>
     public class ResponseMessages
     {
         public const string DuplicateKeyMessage = "duplicate key";
@@ -59,7 +62,7 @@
 
         public const string InvalidCredential = "Invalid Credentials";
         public const string UserEmailNotConfirmed = "User's email has not been confirmed";
-        
+
         //Subscription service
         public const string SubscriptionExist = "Subscription already exist";
         public const string SubscriptionNotExist = "Subscription does not exist";

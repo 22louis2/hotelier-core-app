@@ -7,7 +7,7 @@ namespace hotelier_core_app.Service.AutoMapper
 {
     public class AutoMapperProfile : Profile
     {
-        public AutoMapperProfile() 
+        public AutoMapperProfile()
         {
             CreateMap<CreateUserRequestDTO, ApplicationUser>()
                 .ForMember(x => x.UserName, y => { y.MapFrom(p => p.Email); })
@@ -29,7 +29,7 @@ namespace hotelier_core_app.Service.AutoMapper
             CreateMap<ApplicationRole, RoleResponseDTO>();
             CreateMap<CreateRoleRequestDTO, ApplicationRole>();
             CreateMap<UpdateRoleRequestDTO, ApplicationRole>();
-                
+
             CreateMap<CreateSubscriptionPlanDTO, SubscriptionPlan>()
                 .ForMember(dest => dest.CreationDate, opt => opt.MapFrom(src => DateTime.UtcNow))
                 .ForMember(dest => dest.LastModifiedDate, opt => opt.Ignore())

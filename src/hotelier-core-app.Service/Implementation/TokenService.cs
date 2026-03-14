@@ -12,6 +12,10 @@ using System.Text;
 namespace hotelier_core_app.Service.Implementation
 {
     public class TokenService : ITokenService
+    /// <summary>
+    /// Initializes a new instance of the TokenService class with JWT configuration.
+    /// </summary>
+    /// <param name="jwtConfig">JWT configuration options.</param>
     {
         private readonly IOptions<JwtConfig> _jwtConfig;
 
@@ -26,6 +30,11 @@ namespace hotelier_core_app.Service.Implementation
         /// <param name="Request"></param>
         /// <returns></returns>
         public string GetUserFullName(HttpRequest request)
+        /// <summary>
+        /// Gets the user's full name from the JWT token in the HTTP request.
+        /// </summary>
+        /// <param name="request">The HTTP request containing the JWT token.</param>
+        /// <returns>The user's full name if present, otherwise an empty string.</returns>
         {
             return GetSingleClaimValue(ExtractSecurityToken(request), ClaimTypes.Name);
         }
@@ -36,6 +45,11 @@ namespace hotelier_core_app.Service.Implementation
         /// <param name="request"></param>
         /// <returns></returns>
         public string GetUserEmail(HttpRequest request)
+        /// <summary>
+        /// Gets the user's email from the JWT token in the HTTP request.
+        /// </summary>
+        /// <param name="request">The HTTP request containing the JWT token.</param>
+        /// <returns>The user's email if present, otherwise an empty string.</returns>
         {
             return GetSingleClaimValue(ExtractSecurityToken(request), ClaimTypes.Email);
         }
@@ -46,6 +60,11 @@ namespace hotelier_core_app.Service.Implementation
         /// <param name="request"></param>
         /// <returns>A list of user roles extracted from the token.</returns>
         public List<string> GetUserRoles(HttpRequest request)
+        /// <summary>
+        /// Gets the user's roles from the JWT token in the HTTP request.
+        /// </summary>
+        /// <param name="request">The HTTP request containing the JWT token.</param>
+        /// <returns>A list of user roles extracted from the token.</returns>
         {
             return GetMultipleClaimValues(ExtractSecurityToken(request), ClaimTypes.Role);
         }
@@ -58,6 +77,13 @@ namespace hotelier_core_app.Service.Implementation
         /// <param name="userRoles"></param>
         /// <returns></returns>
         public string GenerateJSONWebToken(string fullName, string email, List<string> userRoles)
+        /// <summary>
+        /// Generates a JWT token for the specified user details and roles.
+        /// </summary>
+        /// <param name="fullName">The user's full name.</param>
+        /// <param name="email">The user's email address.</param>
+        /// <param name="userRoles">A list of user roles.</param>
+        /// <returns>The generated JWT token as a string.</returns>
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfig.Value.TokenKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -87,6 +113,11 @@ namespace hotelier_core_app.Service.Implementation
         /// <param name="token">The raw JWT token string.</param>
         /// <returns>A JwtSecurityToken object containing the token's claims.</returns>
         public JwtSecurityToken GetClaims(string token)
+        /// <summary>
+        /// Extracts the claims from a JWT token string.
+        /// </summary>
+        /// <param name="token">The raw JWT token string.</param>
+        /// <returns>A JwtSecurityToken object containing the token's claims.</returns>
         {
             if (string.IsNullOrWhiteSpace(token))
             {
@@ -124,6 +155,11 @@ namespace hotelier_core_app.Service.Implementation
         /// <param name="request"></param>
         /// <returns></returns>
         public string GetMacAddress(HttpRequest request)
+        /// <summary>
+        /// Gets the user's MacAddress from the request header.
+        /// </summary>
+        /// <param name="request">The HTTP request containing the MacAddress header.</param>
+        /// <returns>The MacAddress value if present, otherwise an empty string.</returns>
         {
             return GetHeaderValue(request, "MacAddress");
         }

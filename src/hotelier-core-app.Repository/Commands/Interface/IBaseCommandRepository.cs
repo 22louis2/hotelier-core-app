@@ -4,7 +4,7 @@
     {
         object AddSoft(TEntity entity);
 
-        Task<object> AddSoftAsync(TEntity entity);
+        Task<object?> AddSoftAsync(TEntity entity);
 
         object Add(TEntity entity);
 

@@ -4,8 +4,16 @@ using Microsoft.Extensions.Configuration;
 
 namespace hotelier_core_app.Migrations
 {
+    /// <summary>
+    /// Factory for creating <see cref="AppDbContext"/> instances at design time for migrations.
+    /// </summary>
     internal class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
     {
+        /// <summary>
+        /// Creates a new <see cref="AppDbContext"/> instance for design-time operations.
+        /// </summary>
+        /// <param name="args">Command-line arguments.</param>
+        /// <returns>A new <see cref="AppDbContext"/> instance.</returns>
         public AppDbContext CreateDbContext(string[] args)
         {
             string jsonPath = "appsettings.json";
@@ -26,10 +34,11 @@ namespace hotelier_core_app.Migrations
 
             var builder = new DbContextOptionsBuilder<AppDbContext>();
             builder.UseNpgsql(connectionString);
+            var tenantProvider = new TenantProvider();
+            tenantProvider.SetSchema("public");
 
-            return new AppDbContext(builder.Options);
+            return new AppDbContext(builder.Options, tenantProvider);
         }
     }
-
 
 }

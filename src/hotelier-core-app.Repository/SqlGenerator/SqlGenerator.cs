@@ -1,12 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using hotelier_core_app.Domain.Attributes;
+using hotelier_core_app.Domain.Extensions;
+using hotelier_core_app.Domain.Helpers;
+using hotelier_core_app.Domain.SqlGenerator.QueryExpressions;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using hotelier_core_app.Domain.Helpers;
-using hotelier_core_app.Domain.Extensions;
-using hotelier_core_app.Domain.Attributes;
-using hotelier_core_app.Domain.SqlGenerator.QueryExpressions;
 
 namespace hotelier_core_app.Domain.SqlGenerator
 {
@@ -117,7 +117,7 @@ namespace hotelier_core_app.Domain.SqlGenerator
         public SqlQuery GetUpdateQuery(TEntity entity)
         {
             SqlPropertyMetadata[] array = SearchableProperties.Where((SqlPropertyMetadata p) => !KeyProperties
-                .Any((SqlPropertyMetadata k) => k.PropertyName.Equals(p.PropertyName, StringComparison.OrdinalIgnoreCase)) && 
+                .Any((SqlPropertyMetadata k) => k.PropertyName.Equals(p.PropertyName, StringComparison.OrdinalIgnoreCase)) &&
                 !p.IgnoreUpdate).ToArray();
 
             if (!array.Any())

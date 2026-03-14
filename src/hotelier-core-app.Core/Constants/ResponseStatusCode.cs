@@ -1,5 +1,8 @@
 ﻿namespace hotelier_core_app.Core.Constants
 {
+    /// <summary>
+    /// Contains standard response status codes used throughout the application.
+    /// </summary>
     public class ResponseStatusCode
     {
         public const string DuplicateKeyMessage = "001";

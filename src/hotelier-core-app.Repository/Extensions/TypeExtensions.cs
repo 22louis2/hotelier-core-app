@@ -1,9 +1,9 @@
-﻿using hotelier_core_app.Domain.SqlGenerator;
+﻿using hotelier_core_app.Domain.Attributes;
+using hotelier_core_app.Domain.SqlGenerator;
 using System.Collections.Concurrent;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
-using hotelier_core_app.Domain.Attributes;
 
 namespace hotelier_core_app.Domain.Extensions
 {
@@ -13,11 +13,16 @@ namespace hotelier_core_app.Domain.Extensions
 
         private static readonly ConcurrentDictionary<Type, SqlPropertyMetadata[]> _metaDataPropertyCache = new ConcurrentDictionary<Type, SqlPropertyMetadata[]>();
 
+        /// <summary>
+        /// Finds and caches all properties of the specified class type.
+        /// </summary>
+        /// <param name="objectType">The type of the class to inspect.</param>
+        /// <returns>An array of PropertyInfo representing the class properties.</returns>
         public static PropertyInfo[] FindClassProperties(this Type objectType)
         {
-            if (_reflectionPropertyCache.TryGetValue(objectType, out PropertyInfo[] value))
+            if (_reflectionPropertyCache.TryGetValue(objectType, out PropertyInfo[]? value))
             {
-                return value;
+                return value ?? Array.Empty<PropertyInfo>();
             }
 
             PropertyInfo[] properties = objectType.GetProperties();
@@ -25,11 +30,16 @@ namespace hotelier_core_app.Domain.Extensions
             return properties;
         }
 
+        /// <summary>
+        /// Finds and caches metadata properties of the specified class type, ordered by identity, key, and column order.
+        /// </summary>
+        /// <param name="objectType">The type of the class to inspect.</param>
+        /// <returns>An array of SqlPropertyMetadata representing the metadata properties.</returns>
         public static SqlPropertyMetadata[] FindClassMetaDataProperties(this Type objectType)
         {
-            if (_metaDataPropertyCache.TryGetValue(objectType, out SqlPropertyMetadata[] value))
+            if (_metaDataPropertyCache.TryGetValue(objectType, out SqlPropertyMetadata[]? value))
             {
-                return value;
+                return value ?? Array.Empty<SqlPropertyMetadata>();
             }
 
             SqlPropertyMetadata[] array = (from p in (from x in objectType.GetProperties()
@@ -42,11 +52,16 @@ namespace hotelier_core_app.Domain.Extensions
             return array;
         }
 
+        /// <summary>
+        /// Finds and caches navigation property metadata for the specified class type, excluding keys and 'id' properties.
+        /// </summary>
+        /// <param name="objectType">The type of the class to inspect.</param>
+        /// <returns>An array of SqlPropertyMetadata representing navigation properties.</returns>
         public static SqlPropertyMetadata[] GetNavigationPropertyMetaDataProperties(this Type objectType)
         {
-            if (_metaDataPropertyCache.TryGetValue(objectType, out SqlPropertyMetadata[] value))
+            if (_metaDataPropertyCache.TryGetValue(objectType, out SqlPropertyMetadata[]? value))
             {
-                return value;
+                return value ?? Array.Empty<SqlPropertyMetadata>();
             }
 
             SqlPropertyMetadata[] array = (from p in objectType.GetProperties()
@@ -56,6 +71,11 @@ namespace hotelier_core_app.Domain.Extensions
             return array;
         }
 
+        /// <summary>
+        /// Returns the underlying type if the specified type is nullable; otherwise, returns the type itself.
+        /// </summary>
+        /// <param name="type">The type to unwrap.</param>
+        /// <returns>The underlying type if nullable, or the original type.</returns>
         public static Type UnwrapNullableType(this Type type)
         {
             return Nullable.GetUnderlyingType(type) ?? type;

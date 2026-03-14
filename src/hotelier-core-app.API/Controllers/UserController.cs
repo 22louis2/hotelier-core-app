@@ -110,8 +110,10 @@ namespace hotelier_core_app.API.Controllers
             var (response, refreshToken) = await _userService.Login(model, auditLog);
             if (response.Status)
             {
-                Response.Headers.TryAdd("Token", _tokenHelper.GenerateJSONWebToken(response.Data.FullName, response.Data.Email, 
-                    response.Data.Roles ?? Enumerable.Empty<string>().ToList()));
+                Response.Headers.TryAdd("Token", _tokenHelper.GenerateJSONWebToken(
+                    response.Data?.FullName ?? string.Empty,
+                    response.Data?.Email ?? string.Empty,
+                    response.Data?.Roles ?? Enumerable.Empty<string>().ToList()));
                 Response.Headers.TryAdd("TokenExpiry", _jwtConfig.Value.TokenExpiryPeriod);
                 Response.Headers.TryAdd("Access-Control-Expose-Headers", "Token,TokenExpiry,RefreshToken");
                 Response.Headers.TryAdd("RefreshToken", refreshToken);
@@ -137,8 +139,10 @@ namespace hotelier_core_app.API.Controllers
             var (response, refreshToken) = await _userService.RefreshToken(model, auditLog);
             if (response.Status)
             {
-                Response.Headers.TryAdd("Token", _tokenHelper.GenerateJSONWebToken(response.Data.FullName, response.Data.Email, 
-                    response.Data.Roles ?? Enumerable.Empty<string>().ToList()));
+                Response.Headers.TryAdd("Token", _tokenHelper.GenerateJSONWebToken(
+                    response.Data?.FullName ?? string.Empty,
+                    response.Data?.Email ?? string.Empty,
+                    response.Data?.Roles ?? Enumerable.Empty<string>().ToList()));
                 Response.Headers.TryAdd("TokenExpiry", _jwtConfig.Value.TokenExpiryPeriod);
                 Response.Headers.TryAdd("Access-Control-Expose-Headers", "Token,TokenExpiry,RefreshToken");
                 Response.Headers.TryAdd("RefreshToken", refreshToken);

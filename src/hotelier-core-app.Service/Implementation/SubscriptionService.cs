@@ -1,6 +1,5 @@
 using AutoMapper;
 using hotelier_core_app.Core.Constants;
-using hotelier_core_app.Core.Enums;
 using hotelier_core_app.Domain.Commands.Interface;
 using hotelier_core_app.Domain.Queries.Interface;
 using hotelier_core_app.Model.DTOs.Request;
@@ -10,6 +9,9 @@ using hotelier_core_app.Service.Interface;
 
 namespace hotelier_core_app.Service.Implementation;
 
+/// <summary>
+/// Provides business logic for managing subscription plans and tenant assignments.
+/// </summary>
 public class SubscriptionService : ISubscriptionService
 {
     private readonly IDBCommandRepository<SubscriptionPlan> _planCommandRepository;
@@ -18,7 +20,7 @@ public class SubscriptionService : ISubscriptionService
     private readonly IDBCommandRepository<Tenant> _tenantCommandRepository;
     private readonly IDBCommandRepository<AuditLog> _auditLogCommandRepository;
     private readonly IMapper _mapper;
-    
+
     public SubscriptionService(IDBCommandRepository<SubscriptionPlan> planCommandRepository,
         IDBQueryRepository<SubscriptionPlan> planQueryRepository,
         IDBQueryRepository<Tenant> tenantQueryRepository,
@@ -34,6 +36,12 @@ public class SubscriptionService : ISubscriptionService
         this._mapper = mapper;
     }
     public async Task<BaseResponse> CreateSubscriptionPlanAsync(CreateSubscriptionPlanDTO request, AuditLog auditLog)
+    /// <summary>
+    /// Creates a new subscription plan if it does not already exist.
+    /// </summary>
+    /// <param name="request">The subscription plan creation details.</param>
+    /// <param name="auditLog">Audit log information for the operation.</param>
+    /// <returns>Returns a success response if created, otherwise failure if the plan exists.</returns>
     {
         var existingPlan = await _planQueryRepository.GetByDefaultAsync(p => p.Name == request.Name && p.IsDeleted == false);
         if (existingPlan != null)
@@ -50,9 +58,13 @@ public class SubscriptionService : ISubscriptionService
     }
 
     public async Task<BaseResponse<SubscriptionPlanResponseDTO>> GetSubscriptionPlanByIdAsync(long id)
+    /// <summary>
+    /// Retrieves a subscription plan by its ID.
+    /// </summary>
+    /// <param name="id">The ID of the subscription plan.</param>
+    /// <returns>Returns the subscription plan DTO if found, otherwise failure.</returns>
     {
         var plan = await _planQueryRepository.FindAsync(id);
-        Console.WriteLine(plan.ToString());
         if (plan == null)
             return BaseResponse<SubscriptionPlanResponseDTO>.Failure(null, ResponseMessages.SubscriptionNotExist);
 
@@ -61,13 +73,23 @@ public class SubscriptionService : ISubscriptionService
     }
 
     public async Task<BaseResponse<List<SubscriptionPlanResponseDTO>>> GetAllSubscriptionPlansAsync()
+    /// <summary>
+    /// Retrieves all subscription plans in the system.
+    /// </summary>
+    /// <returns>Returns a list of all subscription plan DTOs.</returns>
     {
         var plans = await _planQueryRepository.GetAllAsync();
-        var response =  _mapper.Map<List<SubscriptionPlanResponseDTO>>(plans);
+        var response = _mapper.Map<List<SubscriptionPlanResponseDTO>>(plans);
         return BaseResponse<List<SubscriptionPlanResponseDTO>>.Success(response);
     }
 
     public async Task<BaseResponse> DeleteSubscriptionPlanAsync(long id, AuditLog auditLog)
+    /// <summary>
+    /// Marks a subscription plan as deleted by its ID.
+    /// </summary>
+    /// <param name="id">The ID of the subscription plan to delete.</param>
+    /// <param name="auditLog">Audit log information for the operation.</param>
+    /// <returns>Returns a success response if deleted, otherwise failure if not found.</returns>
     {
         var plan = await _planQueryRepository.FindAsync(id);
         if (plan == null)
@@ -85,6 +107,12 @@ public class SubscriptionService : ISubscriptionService
 
 
     public async Task<BaseResponse> AssignSubscriptionPlanToTenantAsync(AssignSubscriptionPlanDTO request,
+    /// <summary>
+    /// Assigns a subscription plan to a tenant for a specified number of months.
+    /// </summary>
+    /// <param name="request">The assignment details including tenant and plan information.</param>
+    /// <param name="auditLog">Audit log information for the operation.</param>
+    /// <returns>Returns a success response if assigned, otherwise failure if tenant or plan not found or months invalid.</returns>
         AuditLog auditLog)
     {
         var tenant = await _tenantQueryRepository.FindAsync(request.TenantId);
