@@ -3,6 +3,7 @@ using hotelier_core_app.Core.Constants;
 using hotelier_core_app.Core.Enums;
 using hotelier_core_app.Domain.Commands.Interface;
 using hotelier_core_app.Model.DTOs.Request;
+using hotelier_core_app.Model.DTOs.Response;
 using hotelier_core_app.Model.Entities;
 using hotelier_core_app.Service.Implementation;
 using hotelier_core_app.Service.Interface;
@@ -52,6 +53,7 @@ namespace Service.Implementation
         private readonly IEmailService _emailService = Substitute.For<IEmailService>();
         private readonly IMapper _mapper = Substitute.For<IMapper>();
         private readonly IConfiguration _config = Substitute.For<IConfiguration>();
+        private readonly IModuleService _moduleService = Substitute.For<IModuleService>();
         private readonly AuditLog _auditLog = new() { PerformedBy = "tester" };
 
         private UserService CreateService() => new(
@@ -62,7 +64,8 @@ namespace Service.Implementation
             _tenantCommandRepo,
             _emailService,
             _mapper,
-            _config
+            _config,
+            _moduleService
         );
 
         [Fact]
@@ -284,6 +287,63 @@ namespace Service.Implementation
         }
 
         [Fact]
+        public async Task GetAssignedModules_ShouldReturnFailure_WhenUserDoesNotExist()
+        {
+            _userManager.FindByEmailAsync(Arg.Any<string>()).Returns((ApplicationUser)null);
+            var service = CreateService();
+
+            var result = await service.GetAssignedModules("missing@test.com");
+
+            Assert.False(result.Status);
+            Assert.Equal(ResponseMessages.UserDoesNotExist, result.Message);
+        }
+
+        [Fact]
+        public async Task GetAssignedModules_ShouldReturnSuccess_WhenUserExists()
+        {
+            var user = new ApplicationUser { Email = "user@test.com" };
+            var modules = new List<ModuleGroupDTO>();
+            _userManager.FindByEmailAsync(Arg.Any<string>()).Returns(user);
+            _userManager.GetRolesAsync(user).Returns(["Admin"]);
+            _moduleService.GetAssignedModulesAsync(Arg.Any<List<string>>())
+                .Returns(BaseResponse<List<ModuleGroupDTO>>.Success(modules));
+
+            var service = CreateService();
+            var result = await service.GetAssignedModules("user@test.com");
+
+            Assert.True(result.Status);
+            Assert.Same(modules, result.Data);
+            Assert.Equal(ResponseMessages.ModulesRetrieved, result.Message);
+        }
+
+        [Fact]
+        public async Task GetUserByEmail_ShouldReturnFailure_WhenUserDoesNotExist()
+        {
+            _userManager.FindByEmailAsync(Arg.Any<string>()).Returns((ApplicationUser)null);
+            var service = CreateService();
+
+            var result = await service.GetUserByEmail("missing@test.com");
+
+            Assert.False(result.Status);
+            Assert.Equal(ResponseMessages.UserDoesNotExist, result.Message);
+        }
+
+        [Fact]
+        public async Task GetUserByEmail_ShouldReturnSuccess_WhenUserExists()
+        {
+            var user = new ApplicationUser { Email = "user@test.com", FullName = "Test User" };
+            var dto = new ApplicationUserDTO { Email = "user@test.com", FullName = "Test User" };
+            _userManager.FindByEmailAsync(Arg.Any<string>()).Returns(user);
+            _mapper.Map<ApplicationUserDTO>(user).Returns(dto);
+            var service = CreateService();
+
+            var result = await service.GetUserByEmail("user@test.com");
+
+            Assert.True(result.Status);
+            Assert.Equal("user@test.com", result.Data.Email);
+        }
+
+        [Fact]
         public async Task ReassignRole_ShouldReturnFailure_WhenUserNotFound()
         {
             _userManager.FindByEmailAsync(Arg.Any<string>()).Returns((ApplicationUser)null);
@@ -317,6 +377,76 @@ namespace Service.Implementation
             var result = await service.ReassignRole(dto, _auditLog);
             Assert.False(result.Status);
             Assert.Equal(ResponseMessages.RoleNotExist, result.Message);
+        }
+
+        [Fact]
+        public async Task ReassignRole_ShouldReturnFailure_WhenEmailIsEmpty()
+        {
+            var service = CreateService();
+            var dto = new EditUserRolesRequestDTO { Email = string.Empty, Roles = ["Admin"] };
+
+            var result = await service.ReassignRole(dto, _auditLog);
+
+            Assert.False(result.Status);
+            Assert.Equal(ResponseMessages.UserDoesNotExist, result.Message);
+        }
+
+        [Fact]
+        public async Task ReassignRole_ShouldReturnFailure_WhenRemoveRolesFails()
+        {
+            var user = new ApplicationUser { Email = "active@test.com", IsActive = true };
+            _userManager.FindByEmailAsync(Arg.Any<string>()).Returns(user);
+            _roleManager.RoleExistsAsync("Admin").Returns(true);
+            _userManager.GetRolesAsync(user).Returns(["OldRole"]);
+            _userManager.RemoveFromRolesAsync(user, Arg.Any<IEnumerable<string>>()).Returns(IdentityResult.Failed());
+
+            var service = CreateService();
+            var dto = new EditUserRolesRequestDTO { Email = "active@test.com", Roles = ["Admin"] };
+
+            var result = await service.ReassignRole(dto, _auditLog);
+
+            Assert.False(result.Status);
+            Assert.Equal(ResponseMessages.RoleReassignmentError, result.Message);
+        }
+
+        [Fact]
+        public async Task ReassignRole_ShouldReturnFailure_WhenAddRolesFails()
+        {
+            var user = new ApplicationUser { Email = "active@test.com", IsActive = true };
+            _userManager.FindByEmailAsync(Arg.Any<string>()).Returns(user);
+            _roleManager.RoleExistsAsync("Admin").Returns(true);
+            _userManager.GetRolesAsync(user).Returns(["OldRole"]);
+            _userManager.RemoveFromRolesAsync(user, Arg.Any<IEnumerable<string>>()).Returns(IdentityResult.Success);
+            _userManager.AddToRolesAsync(user, Arg.Any<IEnumerable<string>>()).Returns(IdentityResult.Failed());
+
+            var service = CreateService();
+            var dto = new EditUserRolesRequestDTO { Email = "active@test.com", Roles = ["Admin"] };
+
+            var result = await service.ReassignRole(dto, _auditLog);
+
+            Assert.False(result.Status);
+            Assert.Equal(ResponseMessages.RoleReassignmentError, result.Message);
+        }
+
+        [Fact]
+        public async Task ReassignRole_ShouldReturnSuccess_WhenRoleReassignmentSucceeds()
+        {
+            var user = new ApplicationUser { Email = "active@test.com", IsActive = true };
+            _userManager.FindByEmailAsync(Arg.Any<string>()).Returns(user);
+            _roleManager.RoleExistsAsync("Admin").Returns(true);
+            _userManager.GetRolesAsync(user).Returns(["OldRole"]);
+            _userManager.RemoveFromRolesAsync(user, Arg.Any<IEnumerable<string>>()).Returns(IdentityResult.Success);
+            _userManager.AddToRolesAsync(user, Arg.Any<IEnumerable<string>>()).Returns(IdentityResult.Success);
+
+            var service = CreateService();
+            var dto = new EditUserRolesRequestDTO { Email = "active@test.com", Roles = ["Admin"] };
+
+            var result = await service.ReassignRole(dto, _auditLog);
+
+            Assert.True(result.Status);
+            Assert.Equal(ResponseMessages.RoleUpdated, result.Message);
+            await _auditLogCommandRepo.Received(1).AddAsync(_auditLog);
+            await _auditLogCommandRepo.Received(1).SaveAsync();
         }
 
         [Fact]
@@ -394,6 +524,54 @@ namespace Service.Implementation
             var result = await service.UpdateUserName(dto, _auditLog);
             Assert.True(result.Status);
             Assert.Equal(ResponseMessages.UpdateSuccessful, result.Message);
+        }
+
+        [Fact]
+        public async Task GetAssignedModules_ShouldReturnFailure_WhenUserNotFound()
+        {
+            _userManager.FindByEmailAsync(Arg.Any<string>()).Returns((ApplicationUser)null);
+            var service = CreateService();
+
+            var result = await service.GetAssignedModules("missing@test.com");
+
+            Assert.False(result.Status);
+            Assert.Equal(ResponseMessages.UserDoesNotExist, result.Message);
+            Assert.NotNull(result.Data);
+            Assert.Empty(result.Data);
+        }
+
+        [Fact]
+        public async Task ReassignRole_ShouldReturnSuccess_WhenUserIsActiveAndRolesAreValid()
+        {
+            var user = new ApplicationUser { Email = "active@test.com", IsActive = true };
+            _userManager.FindByEmailAsync("active@test.com").Returns(user);
+            _roleManager.RoleExistsAsync(Arg.Any<string>()).Returns(true);
+            _userManager.GetRolesAsync(user).Returns(new List<string> { "OldRole" });
+            _userManager.RemoveFromRolesAsync(user, Arg.Any<IEnumerable<string>>()).Returns(IdentityResult.Success);
+            _userManager.AddToRolesAsync(user, Arg.Any<IEnumerable<string>>()).Returns(IdentityResult.Success);
+
+            var service = CreateService();
+            var dto = new EditUserRolesRequestDTO { Email = "active@test.com", Roles = ["Admin", "Manager"] };
+            var result = await service.ReassignRole(dto, _auditLog);
+
+            Assert.True(result.Status);
+            Assert.Equal(ResponseMessages.RoleUpdated, result.Message);
+        }
+
+        [Fact]
+        public async Task Login_ShouldReturnFailure_WhenPasswordSignInFails()
+        {
+            var user = new ApplicationUser { Email = "user@test.com", IsActive = true, EmailConfirmed = true };
+            _userManager.Users.Returns(new List<ApplicationUser> { user }.AsQueryable());
+            _userManager.CheckPasswordAsync(user, Arg.Any<string>()).Returns(false);
+
+            var service = CreateService();
+            var dto = new UserLoginRequestDTO { Email = "user@test.com", Password = "bad-pass", RememberMe = false };
+            var result = await service.Login(dto, _auditLog);
+
+            Assert.False(result.Item1.Status);
+            Assert.Equal(ResponseMessages.InvalidCredential, result.Item1.Message);
+            Assert.Equal(string.Empty, result.Item2);
         }
     }
 }
