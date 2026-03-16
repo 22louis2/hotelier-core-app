@@ -31,13 +31,13 @@ namespace hotelier_core_app.Service.Implementation
             _mapper = mapper;
         }
 
-        public async Task<BaseResponse<ServiceRequestStateResponseDTO>> ChangeServiceRequestStateAsync(long serviceRequestId, ServiceRequestTrigger trigger)
         /// <summary>
         /// Changes the state of a service request using the specified trigger.
         /// </summary>
         /// <param name="serviceRequestId">The ID of the service request.</param>
         /// <param name="trigger">The trigger to fire for the state change.</param>
         /// <returns>Returns the updated service request state, or failure if not found or trigger is invalid.</returns>
+        public async Task<BaseResponse<ServiceRequestStateResponseDTO>> ChangeServiceRequestStateAsync(long serviceRequestId, ServiceRequestTrigger trigger)
         {
             var serviceRequest = await _serviceRequestQueryRepository.FindAsync(serviceRequestId);
             if (serviceRequest == null)
@@ -58,12 +58,12 @@ namespace hotelier_core_app.Service.Implementation
             return BaseResponse<ServiceRequestStateResponseDTO>.Success(responseDto, "State changed successfully", ResponseStatusCode.OperationSuccessful);
         }
 
-        public async Task<BaseResponse<ServiceRequestStateResponseDTO>> GetServiceRequestStateAsync(long serviceRequestId)
         /// <summary>
         /// Retrieves the current state and available triggers for a service request.
         /// </summary>
         /// <param name="serviceRequestId">The ID of the service request.</param>
         /// <returns>Returns the service request state and available triggers, or failure if not found.</returns>
+        public async Task<BaseResponse<ServiceRequestStateResponseDTO>> GetServiceRequestStateAsync(long serviceRequestId)
         {
             var serviceRequest = await _serviceRequestQueryRepository.FindAsync(serviceRequestId);
             if (serviceRequest == null)
@@ -80,12 +80,12 @@ namespace hotelier_core_app.Service.Implementation
             return BaseResponse<ServiceRequestStateResponseDTO>.Success(responseDto, "State fetched successfully", ResponseStatusCode.OperationSuccessful);
         }
 
-        public async Task<BaseResponse<List<ServiceRequestTrigger>>> GetAvailableTriggersAsync(long serviceRequestId)
         /// <summary>
         /// Retrieves all available triggers for a service request's current state.
         /// </summary>
         /// <param name="serviceRequestId">The ID of the service request.</param>
         /// <returns>Returns a list of available triggers, or failure if service request not found.</returns>
+        public async Task<BaseResponse<List<ServiceRequestTrigger>>> GetAvailableTriggersAsync(long serviceRequestId)
         {
             var serviceRequest = await _serviceRequestQueryRepository.FindAsync(serviceRequestId);
             if (serviceRequest == null)

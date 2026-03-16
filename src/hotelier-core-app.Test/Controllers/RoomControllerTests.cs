@@ -1,4 +1,5 @@
 using hotelier_core_app.API.Controllers;
+using hotelier_core_app.Core.Constants;
 using hotelier_core_app.Core.States;
 using hotelier_core_app.Model.DTOs.Response;
 using hotelier_core_app.Service.Interface;
@@ -60,8 +61,27 @@ public class RoomControllerTests
     [Fact]
     public async Task GetRoomState_ReturnsNotFound_WhenStateIsNull()
     {
+        _roomService.GetRoomStateAsync(Arg.Any<long>())
+            .Returns(Task.FromResult(BaseResponse<RoomStateResponseDTO>.Failure(
+                new RoomStateResponseDTO(),
+                "Room not found",
+                ResponseStatusCode.NoRecordFound)));
+
         var result = await _controller.GetRoomState(1);
-        Assert.IsType<NotFoundResult>(result);
+        Assert.IsType<NotFoundObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task GetRoomState_ReturnsBadRequest_WhenFailureIsNotNotFound()
+    {
+        _roomService.GetRoomStateAsync(Arg.Any<long>())
+            .Returns(Task.FromResult(BaseResponse<RoomStateResponseDTO>.Failure(
+                new RoomStateResponseDTO(),
+                "Invalid room state",
+                ResponseStatusCode.InvalidData)));
+
+        var result = await _controller.GetRoomState(1);
+        Assert.IsType<BadRequestObjectResult>(result);
     }
 
     [Fact]

@@ -305,7 +305,7 @@ namespace Service.Implementation
             var modules = new List<ModuleGroupDTO>();
             _userManager.FindByEmailAsync(Arg.Any<string>()).Returns(user);
             _userManager.GetRolesAsync(user).Returns(["Admin"]);
-            _moduleService.GetAssignedModulesAsync(Arg.Any<List<string>>())
+            _moduleService.GetAssignedModules(Arg.Any<List<string>>())
                 .Returns(BaseResponse<List<ModuleGroupDTO>>.Success(modules));
 
             var service = CreateService();

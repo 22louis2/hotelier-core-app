@@ -236,7 +236,7 @@ namespace hotelier_core_app.Service.Implementation
         }
         
         
-        public BaseResponse<List<ModuleGroupDTO>> GetAssignedModulesAsync(List<string> roles)
+        public BaseResponse<List<ModuleGroupDTO>> GetAssignedModules(List<string> roles)
         {
             if (roles == null || !roles.Any())
             {

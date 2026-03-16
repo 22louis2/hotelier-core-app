@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 
 namespace hotelier_core_app.Migrations
@@ -33,7 +34,8 @@ namespace hotelier_core_app.Migrations
             }
 
             var builder = new DbContextOptionsBuilder<AppDbContext>();
-            builder.UseNpgsql(connectionString);
+                 builder.UseNpgsql(connectionString)
+                     .ReplaceService<IModelCacheKeyFactory, TenantModelCacheKeyFactory>();
             var tenantProvider = new TenantProvider();
             tenantProvider.SetSchema("public");
 

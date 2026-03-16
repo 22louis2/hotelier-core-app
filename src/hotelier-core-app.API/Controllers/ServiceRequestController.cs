@@ -1,4 +1,5 @@
 using hotelier_core_app.Core.States;
+using hotelier_core_app.Core.Constants;
 using hotelier_core_app.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -61,6 +62,10 @@ namespace hotelier_core_app.API.Controllers
             var state = await _serviceRequestService.GetServiceRequestStateAsync(id);
             if (state == null)
                 return NotFound();
+            if (!state.Status && state.StatusCode == ResponseStatusCode.NoRecordFound)
+                return NotFound(state);
+            if (!state.Status)
+                return BadRequest(state);
             return Ok(state);
         }
 
@@ -80,6 +85,10 @@ namespace hotelier_core_app.API.Controllers
             var triggers = await _serviceRequestService.GetAvailableTriggersAsync(id);
             if (triggers == null)
                 return NotFound();
+            if (!triggers.Status && triggers.StatusCode == ResponseStatusCode.NoRecordFound)
+                return NotFound(triggers);
+            if (!triggers.Status)
+                return BadRequest(triggers);
             return Ok(triggers);
         }
     }

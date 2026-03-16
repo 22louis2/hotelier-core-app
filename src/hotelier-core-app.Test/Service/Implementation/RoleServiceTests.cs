@@ -45,6 +45,21 @@ namespace hotelier_core_app.Test.Service.Implementation
         }
 
         [Fact]
+        public async Task CreateRoleAsync_ShouldReturnFailure_WhenTenantIdIsNull()
+        {
+            var service = CreateService();
+            var dto = new CreateRoleRequestDTO { RoleName = "Admin", TenantId = null, PolicyGroupIds = new List<long> { 1 } };
+
+            var result = await service.CreateRoleAsync(dto, _auditLog);
+
+            Assert.False(result.Status);
+            Assert.Equal(ResponseStatusCode.InvalidData, result.StatusCode);
+            Assert.Equal("TenantId is required.", result.Message);
+            await _roleCommandRepo.DidNotReceive().AddAsync(Arg.Any<ApplicationRole>());
+            await _rolePolicyGroupCommandRepo.DidNotReceive().AddAsync(Arg.Any<RolePolicyGroup>());
+        }
+
+        [Fact]
         public async Task CreateRoleAsync_ShouldReturnSuccess_WhenRoleDoesNotExist()
         {
             _roleQueryRepo.GetByDefaultAsync(Arg.Any<Expression<Func<ApplicationRole, bool>>>()).Returns((ApplicationRole)null);

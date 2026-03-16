@@ -1,4 +1,5 @@
 using hotelier_core_app.Migrations;
+using System.Globalization;
 
 namespace hotelier_core_app.API.Middleware
 {
@@ -26,10 +27,25 @@ namespace hotelier_core_app.API.Middleware
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task InvokeAsync(HttpContext context, ITenantProvider tenantProvider)
         {
-            // Example: resolve tenant from header, claims, or subdomain
-            // Here, we use a header for demonstration
             var tenantId = context.Request.Headers["X-Tenant-Id"].ToString();
-            var schema = string.IsNullOrWhiteSpace(tenantId) ? "public" : $"tenant_{tenantId}";
+
+            // Missing header falls back to public schema.
+            if (string.IsNullOrWhiteSpace(tenantId))
+            {
+                tenantProvider.SetSchema("public");
+                await _next(context);
+                return;
+            }
+
+            // Accept only positive numeric tenant IDs and normalize formatting.
+            if (!long.TryParse(tenantId, NumberStyles.None, CultureInfo.InvariantCulture, out var normalizedTenantId) || normalizedTenantId <= 0)
+            {
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsync("Invalid X-Tenant-Id header.");
+                return;
+            }
+
+            var schema = $"tenant_{normalizedTenantId}";
             tenantProvider.SetSchema(schema);
             await _next(context);
         }

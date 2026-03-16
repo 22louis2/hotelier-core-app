@@ -29,6 +29,7 @@ namespace hotelier_core_app.Migrations
         public DbSet<ServiceRequest> ServiceRequests { get; set; }
         public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
         public DbSet<Tenant> Tenants { get; set; }
+        public string CurrentSchema => _tenantProvider?.GetSchema() ?? "public";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AppDbContext"/> class.
@@ -47,7 +48,7 @@ namespace hotelier_core_app.Migrations
         /// <param name="modelBuilder">The model builder.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var schema = _tenantProvider?.GetSchema() ?? "public";
+            var schema = CurrentSchema;
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 // Set schema for all entities

@@ -28,7 +28,7 @@
       </source>
     </sources>
     <properties>
-      <TargetFramework>net6.0</TargetFramework>
+      <TargetFramework>net8.0</TargetFramework>
     </properties>
   </metadata>
   <build>

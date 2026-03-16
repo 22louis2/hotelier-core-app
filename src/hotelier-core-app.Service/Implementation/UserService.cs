@@ -222,7 +222,7 @@ namespace hotelier_core_app.Service.Implementation
             }
             var userRoles = await _userManager.GetRolesAsync(user);
             
-            var modules = _moduleService.GetAssignedModulesAsync(userRoles.ToList());
+            var modules = _moduleService.GetAssignedModules(userRoles.ToList());
             return BaseResponse<List<ModuleGroupDTO>>.Success(modules.Data, ResponseMessages.ModulesRetrieved, ResponseStatusCode.ModulesRetrieved);
         }
 

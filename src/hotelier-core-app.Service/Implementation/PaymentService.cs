@@ -52,13 +52,13 @@ namespace hotelier_core_app.Service.Implementation
             return BaseResponse<PaymentStateResponseDTO>.Success(responseDto, "State fetched successfully", ResponseStatusCode.OperationSuccessful);
         }
 
-        public async Task<BaseResponse<PaymentStateResponseDTO>> ChangePaymentStateAsync(long paymentId, PaymentTrigger trigger)
         /// <summary>
         /// Changes the state of a payment using the specified trigger.
         /// </summary>
         /// <param name="paymentId">The ID of the payment.</param>
         /// <param name="trigger">The trigger to fire for the state change.</param>
         /// <returns>Returns the updated payment state, or failure if not found or trigger is invalid.</returns>
+        public async Task<BaseResponse<PaymentStateResponseDTO>> ChangePaymentStateAsync(long paymentId, PaymentTrigger trigger)
         {
             var payment = await _paymentQueryRepository.FindAsync(paymentId);
             if (payment == null)
@@ -78,12 +78,12 @@ namespace hotelier_core_app.Service.Implementation
             return BaseResponse<PaymentStateResponseDTO>.Success(responseDto, "State changed successfully", ResponseStatusCode.OperationSuccessful);
         }
 
-        public async Task<BaseResponse<List<PaymentTrigger>>> GetAvailableTriggersAsync(long paymentId)
         /// <summary>
         /// Retrieves all available triggers for a payment's current state.
         /// </summary>
         /// <param name="paymentId">The ID of the payment.</param>
         /// <returns>Returns a list of available triggers, or failure if payment not found.</returns>
+        public async Task<BaseResponse<List<PaymentTrigger>>> GetAvailableTriggersAsync(long paymentId)
         {
             var payment = await _paymentQueryRepository.FindAsync(paymentId);
             if (payment == null)
