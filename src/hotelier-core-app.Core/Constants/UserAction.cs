@@ -1,8 +1,5 @@
 ﻿namespace hotelier_core_app.Core.Constants
 {
-    /// <summary>
-    /// Contains standard user action descriptions for audit logging and tracking.
-    /// </summary>
     public class UserAction
     {
         //User management
@@ -31,5 +28,8 @@
         public const string DeleteSubscriptionPlan = "Delete Subscription Plan";
         public const string ActivateSubscriptionPlan = "Activate Subscription Plan";
         public const string DeactivateSubscriptionPlan = "Deactivate Subscription Plan";
+
+        // Property Management
+        public const string AddProperty = "Add Property";
     }
 }

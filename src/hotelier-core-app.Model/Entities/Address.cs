@@ -1,4 +1,4 @@
-﻿using hotelier_core_app.Model.Attributes;
+using hotelier_core_app.Model.Attributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

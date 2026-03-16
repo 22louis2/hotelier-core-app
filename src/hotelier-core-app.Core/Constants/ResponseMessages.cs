@@ -1,8 +1,5 @@
 ﻿namespace hotelier_core_app.Core.Constants
 {
-    /// <summary>
-    /// Contains standard response messages used throughout the application.
-    /// </summary>
     public class ResponseMessages
     {
         public const string DuplicateKeyMessage = "duplicate key";
@@ -67,7 +64,7 @@
         public const string InvalidCredential = "Invalid Credentials";
         public const string UserEmailNotConfirmed = "User's email has not been confirmed";
 
-        //Subscription service
+        // Subscription service
         public const string SubscriptionExist = "Subscription already exist";
         public const string SubscriptionNotExist = "Subscription does not exist";
         public const string SubscriptionCreated = "Subscription created successfully";
@@ -81,5 +78,10 @@
         public const string UserNotInPolicyGroup = "The user is not in the specified policy group";
         public const string PermissionDoesNotExist = "The specified permission does not exist";
         public const string PolicyDoesNotExist = "The specified policy does not exist";
+
+        // Property Management
+        public const string TenantNotExisting = "Tenant does not exist";
+        public const string UserNotInTenant = "The user does not belong to the tenant specified";
+        public const string PropertyNotFound = "PropertyNotFound";
     }
 }
