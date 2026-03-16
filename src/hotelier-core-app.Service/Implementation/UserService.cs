@@ -10,13 +10,26 @@ using hotelier_core_app.Service.Helpers;
 using hotelier_core_app.Service.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace hotelier_core_app.Service.Implementation
 {
     public class UserService : IUserService
+    /// <summary>
+    /// Initializes a new instance of the UserService class with required dependencies.
+    /// </summary>
+    /// <param name="userManager">User manager for identity operations.</param>
+    /// <param name="roleManager">Role manager for identity operations.</param>
+    /// <param name="signInManager">Sign-in manager for authentication.</param>
+    /// <param name="auditLogCommandRepository">Audit log repository.</param>
+    /// <param name="tenantCommandRepository">Tenant repository.</param>
+    /// <param name="emailService">Email service for notifications.</param>
+    /// <param name="mapper">AutoMapper instance.</param>
+    /// <param name="config">Configuration provider.</param>
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
@@ -28,16 +41,18 @@ namespace hotelier_core_app.Service.Implementation
         private readonly string _clientUrl;
         private const string HOTELIER_ADMIN = "Hotelier Admin";
         private const string HOTELIER_ADMIN_EMAIL = "admin@hotelier.com";
+        private readonly IModuleService _moduleService;
 
         public UserService(
-            UserManager<ApplicationUser> userManager, 
-            RoleManager<ApplicationRole> roleManager, 
+            UserManager<ApplicationUser> userManager,
+            RoleManager<ApplicationRole> roleManager,
             SignInManager<ApplicationUser> signInManager,
             IDBCommandRepository<AuditLog> auditLogCommandRepository,
             IDBCommandRepository<Tenant> tenantCommandRepository,
             IEmailService emailService,
             IMapper mapper,
-            IConfiguration config)
+            IConfiguration config,
+            IModuleService moduleService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -47,9 +62,16 @@ namespace hotelier_core_app.Service.Implementation
             _emailService = emailService;
             _mapper = mapper;
             _clientUrl = config.GetSection("Client:ClientURI").Value ?? string.Empty;
+            _moduleService = moduleService;
         }
 
         public async Task<BaseResponse> ActivateUser(ActivateUserRequestDTO model, AuditLog auditLog)
+        /// <summary>
+        /// Activates a user and assigns a role.
+        /// </summary>
+        /// <param name="model">Activation request details.</param>
+        /// <param name="auditLog">Audit log information for the operation.</param>
+        /// <returns>Returns a success response if activated, otherwise failure.</returns>
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
@@ -99,6 +121,12 @@ namespace hotelier_core_app.Service.Implementation
         }
 
         public async Task<BaseResponse> CreateUser(CreateUserRequestDTO model, AuditLog auditLog)
+        /// <summary>
+        /// Creates a new user and assigns a role and tenant.
+        /// </summary>
+        /// <param name="model">User creation details.</param>
+        /// <param name="auditLog">Audit log information for the operation.</param>
+        /// <returns>Returns a success response if created, otherwise failure.</returns>
         {
             var existingUser = await _userManager.FindByEmailAsync(model.Email);
             if (existingUser != null)
@@ -152,6 +180,12 @@ namespace hotelier_core_app.Service.Implementation
         }
 
         public async Task<BaseResponse> DeactivateUser(DeactivateUserRequestDTO model, AuditLog auditLog)
+        /// <summary>
+        /// Deactivates a user and updates their status.
+        /// </summary>
+        /// <param name="model">Deactivation request details.</param>
+        /// <param name="auditLog">Audit log information for the operation.</param>
+        /// <returns>Returns a success response if deactivated, otherwise failure.</returns>
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
@@ -179,22 +213,59 @@ namespace hotelier_core_app.Service.Implementation
             return BaseResponse.Failure(ResponseMessages.OperationFailed, ResponseStatusCode.OperationFailed);
         }
 
-        public BaseResponse<List<ModuleGroupDTO>> GetAssignedModules(string emailAddress)
+        public async Task<BaseResponse<List<ModuleGroupDTO>>> GetAssignedModules(string emailAddress)
         {
-            throw new NotImplementedException();
+            var user = await _userManager.FindByEmailAsync(emailAddress);
+            if (user == null)
+            {
+                return BaseResponse<List<ModuleGroupDTO>>.Failure(new List<ModuleGroupDTO>(), ResponseMessages.UserDoesNotExist, ResponseStatusCode.UserDoesNotExist);
+            }
+            var userRoles = await _userManager.GetRolesAsync(user);
+            
+            var modules = _moduleService.GetAssignedModules(userRoles.ToList());
+            return BaseResponse<List<ModuleGroupDTO>>.Success(modules.Data, ResponseMessages.ModulesRetrieved, ResponseStatusCode.ModulesRetrieved);
         }
 
-        public Task<BaseResponse<ApplicationUserDTO>> GetUserByEmail(string email)
+        public async Task<BaseResponse<ApplicationUserDTO>> GetUserByEmail(string email)
         {
-            throw new NotImplementedException();
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return BaseResponse<ApplicationUserDTO>.Failure( new ApplicationUserDTO(),
+                    ResponseMessages.UserDoesNotExist, ResponseStatusCode.UserDoesNotExist);
+            }
+
+            var userResponse = _mapper.Map<ApplicationUserDTO>(user);
+            return BaseResponse<ApplicationUserDTO>.Success(userResponse);
         }
 
-        public Task<PageBaseResponse<List<ApplicationUserDTO>>> GetUsers(PageParamsDTO model)
+        public async Task<PageBaseResponse<List<ApplicationUserDTO>>> GetUsers(PageParamsDTO model)
         {
-            throw new NotImplementedException();
+            var usersQuery =  _userManager.Users.Where(u => !u.IsDeleted);
+            var totalUsers = await usersQuery.CountAsync();
+            if (totalUsers == 0)
+            {
+                return PageBaseResponse<List<ApplicationUserDTO>>.Failure(new List<ApplicationUserDTO>(),
+                    ResponseMessages.UsersFetchFailed, 0, ResponseStatusCode.UsersFetchFailed);
+            }
+            
+            var users = await usersQuery
+                .Skip((model.PageNumber - 1) * model.PageSize)
+                .Take(model.PageSize)
+                .ToListAsync();
+            
+            var usersResponse = _mapper.Map<List<ApplicationUserDTO>>(users);
+            
+            return PageBaseResponse<List<ApplicationUserDTO>>.Success(usersResponse, ResponseMessages.UsersRetrieved, totalUsers, ResponseStatusCode.UsersRetrieved);
         }
 
         public async Task<(BaseResponse<LoginResponseDTO>, string)> Login(UserLoginRequestDTO model, AuditLog auditLog)
+        /// <summary>
+        /// Authenticates a user and returns login response and refresh token.
+        /// </summary>
+        /// <param name="model">Login request details.</param>
+        /// <param name="auditLog">Audit log information for the operation.</param>
+        /// <returns>Returns a tuple of login response and refresh token.</returns>
         {
             var user = _userManager.Users.FirstOrDefault(x => x.Email == model.Email);
 
@@ -206,7 +277,7 @@ namespace hotelier_core_app.Service.Implementation
 
             if (!user.IsActive)
             {
-                return (BaseResponse<LoginResponseDTO>.Failure(new LoginResponseDTO(), 
+                return (BaseResponse<LoginResponseDTO>.Failure(new LoginResponseDTO(),
                     ResponseMessages.UserInactive, ResponseStatusCode.UserInactive), string.Empty);
             }
 
@@ -220,7 +291,7 @@ namespace hotelier_core_app.Service.Implementation
 
             if (!signInResult.Succeeded)
             {
-                return (BaseResponse<LoginResponseDTO>.Failure(new LoginResponseDTO(), 
+                return (BaseResponse<LoginResponseDTO>.Failure(new LoginResponseDTO(),
                     ResponseMessages.InvalidCredential, ResponseStatusCode.InvalidCredential), string.Empty);
             }
 
@@ -235,21 +306,120 @@ namespace hotelier_core_app.Service.Implementation
 
             string refreshToken = await GenerateRefreshTokenAndPersistData(user, auditLog);
 
-            return (BaseResponse<LoginResponseDTO>.Success(data, ResponseMessages.LoginSuccessful, 
+            return (BaseResponse<LoginResponseDTO>.Success(data, ResponseMessages.LoginSuccessful,
                 ResponseStatusCode.LoginSuccessful), refreshToken);
         }
 
-        public Task<BaseResponse> ReassignRole(EditUserRolesRequestDTO model, AuditLog auditLog)
+        public async Task<BaseResponse> ReassignRole(EditUserRolesRequestDTO model, AuditLog auditLog)
+        /// <summary>
+        /// Reassigns roles to a user.
+        /// </summary>
+        /// <param name="model">Role reassignment details.</param>
+        /// <param name="auditLog">Audit log information for the operation.</param>
+        /// <returns>Returns a success response if reassigned, otherwise failure.</returns>
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(model.Email))
+            {
+                return BaseResponse.Failure(ResponseMessages.UserDoesNotExist, ResponseStatusCode.UserDoesNotExist);
+            }
+
+            ApplicationUser? user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user != null)
+            {
+                if (user.IsActive)
+                {
+                    List<string> validRoles = new List<string>();
+
+                    if (model.Roles != null)
+                    {
+                        foreach (var role in model.Roles)
+                        {
+                            if (!await _roleManager.RoleExistsAsync(role))
+                            {
+                                return BaseResponse.Failure(ResponseMessages.RoleNotExist, ResponseStatusCode.RoleNotExist); ;
+                            }
+                        }
+                    }
+
+                    var currentRoles = await _userManager.GetRolesAsync(user);
+                    
+                    var removeUserFromRole = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                    if (!removeUserFromRole.Succeeded)
+                    {
+                        return BaseResponse.Failure(ResponseMessages.RoleReassignmentError, ResponseStatusCode.GeneralError);
+                    }
+                    
+                    var addUserToRole = await _userManager.AddToRolesAsync(user, model.Roles);
+                    if (!addUserToRole.Succeeded)
+                    {
+                        return BaseResponse.Failure(ResponseMessages.RoleReassignmentError, ResponseStatusCode.GeneralError);
+                    }
+                    
+                    await _auditLogCommandRepository.AddAsync(auditLog);
+                    await _auditLogCommandRepository.SaveAsync();
+
+                    // find matching roles
+                    // if found, mark for exclusion from deletion
+                    // check if any changes exists for the role reassignment
+
+                    //if (currentRoles.Contains(newRole))
+                    //{
+                    //    return true;
+                    //}
+
+                    /*
+                        ApplicationUserRole userRole = await _userRoleQueryRepository.GetByDefaultAsync(predicate => predicate.UserId == user.Id);
+                        userRole.RoleId = model.RoleId;
+                        _userRoleCommandRepository.Update(userRole);
+                        _auditLogCommandRepository.Add(auditLog);
+
+                        await _userRoleCommandRepository.SaveAsync();
+                        await _auditLogCommandRepository.SaveAsync();
+
+                        return BaseResponse.Success(ResponseMessages.UpdateSuccessful);
+                    }
+
+                            */
+
+
+                    //var currentRoles = await _userManager.GetRolesAsync(user);
+
+                    //// Remove old roles
+                    //var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                    //if (!removeResult.Succeeded)
+                    //{
+                    //    _logger.LogError($"Failed to remove existing roles for user {user.Email}.");
+                    //    return false;
+                    //}
+
+                    //// Assign new role
+                    //var addResult = await _userManager.AddToRoleAsync(user, newRole);
+                    //if (!addResult.Succeeded)
+                    //{
+                    //    _logger.LogError($"Failed to add role {newRole} to user {user.Email}.");
+                    //    return false;
+                    //}
+
+                    return BaseResponse.Success(ResponseMessages.RoleUpdated);
+                }
+                return BaseResponse.Failure(ResponseMessages.UserInactive);
+            }
+            return BaseResponse.Failure(ResponseMessages.UserDoesNotExist);
         }
 
         public async Task<(BaseResponse<RefreshTokenResponseDTO>, string)> RefreshToken(RefreshTokenRequestDTO model, AuditLog auditLog)
+        /// <summary>
+        /// Refreshes a user's authentication token.
+        /// </summary>
+        /// <param name="model">Refresh token request details.</param>
+        /// <param name="auditLog">Audit log information for the operation.</param>
+        /// <returns>Returns a tuple of refresh token response and new token.</returns>
         {
             var user = _userManager.Users.FirstOrDefault(x => x.Email == model.Email);
             if (user == null)
             {
-                return (BaseResponse<RefreshTokenResponseDTO>.Failure(new RefreshTokenResponseDTO(), 
+                return (BaseResponse<RefreshTokenResponseDTO>.Failure(new RefreshTokenResponseDTO(),
                     ResponseMessages.UserDoesNotExist, ResponseStatusCode.UserDoesNotExist), string.Empty);
             }
 
@@ -259,7 +429,7 @@ namespace hotelier_core_app.Service.Implementation
 
                 RefreshTokenResponseDTO data = new RefreshTokenResponseDTO()
                 {
-                    Email = user.Email?? string.Empty,
+                    Email = user.Email ?? string.Empty,
                     FullName = user.FullName,
                     Roles = userRole.ToList()
                 };
@@ -268,7 +438,7 @@ namespace hotelier_core_app.Service.Implementation
 
                 return (BaseResponse<RefreshTokenResponseDTO>.Success(data, ResponseMessages.LoginSuccessful), refreshToken);
             }
-            return (BaseResponse<RefreshTokenResponseDTO>.Failure(new RefreshTokenResponseDTO(), 
+            return (BaseResponse<RefreshTokenResponseDTO>.Failure(new RefreshTokenResponseDTO(),
                 ResponseMessages.CantVerifyRefreshToken, ResponseStatusCode.CantVerifyRefreshToken), string.Empty);
         }
 
@@ -277,9 +447,37 @@ namespace hotelier_core_app.Service.Implementation
             throw new NotImplementedException();
         }
 
-        public Task<BaseResponse> UpdateUserName(EditUserNameRequestDTO model, AuditLog auditLog)
+        public async Task<BaseResponse> UpdateUserName(EditUserNameRequestDTO model, AuditLog auditLog)
+        /// <summary>
+        /// Updates a user's full name.
+        /// </summary>
+        /// <param name="model">User name update details.</param>
+        /// <param name="auditLog">Audit log information for the operation.</param>
+        /// <returns>Returns a success response if updated, otherwise failure.</returns>
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(model.Email))
+            {
+                return BaseResponse.Failure(ResponseMessages.UserDoesNotExist, ResponseStatusCode.UserDoesNotExist);
+            }
+
+            ApplicationUser? user = await _userManager.FindByEmailAsync(model.Email);
+            if (user != null)
+            {
+                if (user.IsActive)
+                {
+                    user.FullName = model.Name;
+                    user.LastModifiedDate = DateTime.UtcNow;
+                    user.ModifiedBy = auditLog.PerformedBy;
+                    await _userManager.UpdateAsync(user);
+
+                    _auditLogCommandRepository.Add(auditLog);
+                    await _auditLogCommandRepository.SaveAsync();
+
+                    return BaseResponse.Success(ResponseMessages.UpdateSuccessful, ResponseStatusCode.UpdateSuccessful);
+                }
+                return BaseResponse.Failure(ResponseMessages.UserInactive, ResponseStatusCode.UserInactive);
+            }
+            return BaseResponse.Failure(ResponseMessages.UserDoesNotExist, ResponseStatusCode.UserDoesNotExist);
         }
 
         #region private methods
@@ -294,11 +492,11 @@ namespace hotelier_core_app.Service.Implementation
 
             var confirmationLink = QueryHelpers.AddQueryString(_clientUrl + "emailconfirmation", queryParams);
 
-            
+
             await _emailService.SendEmail(new SendEmailDTO(
-                new List<string>() { email }, 
-                "Email Confirmation", 
-                confirmationLink, 
+                new List<string>() { email },
+                "Email Confirmation",
+                confirmationLink,
                 null));
         }
 
@@ -318,6 +516,18 @@ namespace hotelier_core_app.Service.Implementation
 
             await _tenantCommandRepository.AddAsync(tenant);
             await _tenantCommandRepository.SaveAsync();
+
+            await CreateTenantSchemaAsync($"tenant_{tenant.Id}");
+        }
+
+        protected virtual async Task CreateTenantSchemaAsync(string schemaName)
+        {
+            var dbContext = _tenantCommandRepository as DbContext;
+            if (dbContext != null)
+            {
+                var createSchemaSql = $"CREATE SCHEMA IF NOT EXISTS \"{schemaName}\";";
+                await dbContext.Database.ExecuteSqlRawAsync(createSchemaSql);
+            }
         }
 
         private BaseResponse HandleIdentityErrors(IdentityResult result)

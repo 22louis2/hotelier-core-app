@@ -11,6 +11,9 @@ using System.Text;
 
 namespace hotelier_core_app.Service.Implementation
 {
+    /// <summary>
+    /// Provides token generation and token claim extraction helpers.
+    /// </summary>
     public class TokenService : ITokenService
     {
         private readonly IOptions<JwtConfig> _jwtConfig;
@@ -21,29 +24,29 @@ namespace hotelier_core_app.Service.Implementation
         }
 
         /// <summary>
-        /// Get user full name from token
+        /// Gets the user's full name from the JWT token in the HTTP request.
         /// </summary>
-        /// <param name="Request"></param>
-        /// <returns></returns>
+        /// <param name="request">The HTTP request containing the JWT token.</param>
+        /// <returns>The user's full name if present, otherwise an empty string.</returns>
         public string GetUserFullName(HttpRequest request)
         {
             return GetSingleClaimValue(ExtractSecurityToken(request), ClaimTypes.Name);
         }
 
         /// <summary>
-        /// Get user email from token
+        /// Gets the user's email from the JWT token in the HTTP request.
         /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
+        /// <param name="request">The HTTP request containing the JWT token.</param>
+        /// <returns>The user's email if present, otherwise an empty string.</returns>
         public string GetUserEmail(HttpRequest request)
         {
             return GetSingleClaimValue(ExtractSecurityToken(request), ClaimTypes.Email);
         }
 
         /// <summary>
-        /// Get user roles from the token.
+        /// Gets the user's roles from the JWT token in the HTTP request.
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="request">The HTTP request containing the JWT token.</param>
         /// <returns>A list of user roles extracted from the token.</returns>
         public List<string> GetUserRoles(HttpRequest request)
         {
@@ -51,12 +54,12 @@ namespace hotelier_core_app.Service.Implementation
         }
 
         /// <summary>
-        /// Generate jwt token
+        /// Generates a JWT token for the specified user details and roles.
         /// </summary>
-        /// <param name="fullName"></param>
-        /// <param name="email"></param>
-        /// <param name="userRoles"></param>
-        /// <returns></returns>
+        /// <param name="fullName">The user's full name.</param>
+        /// <param name="email">The user's email address.</param>
+        /// <param name="userRoles">A list of user roles.</param>
+        /// <returns>The generated JWT token as a string.</returns>
         public string GenerateJSONWebToken(string fullName, string email, List<string> userRoles)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfig.Value.TokenKey));
@@ -82,7 +85,7 @@ namespace hotelier_core_app.Service.Implementation
         }
 
         /// <summary>
-        /// Extracts the claims from a JWT token.
+        /// Extracts the claims from a JWT token string.
         /// </summary>
         /// <param name="token">The raw JWT token string.</param>
         /// <returns>A JwtSecurityToken object containing the token's claims.</returns>
@@ -119,10 +122,10 @@ namespace hotelier_core_app.Service.Implementation
         }
 
         /// <summary>
-        /// Get user MacAddress from request Header
+        /// Gets the user's MacAddress from the request header.
         /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
+        /// <param name="request">The HTTP request containing the MacAddress header.</param>
+        /// <returns>The MacAddress value if present, otherwise an empty string.</returns>
         public string GetMacAddress(HttpRequest request)
         {
             return GetHeaderValue(request, "MacAddress");

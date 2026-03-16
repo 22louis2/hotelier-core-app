@@ -1,33 +1,41 @@
 using Asp.Versioning;
-using Autofac.Extensions.DependencyInjection;
 using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using hotelier_core_app.API.Controllers;
+using hotelier_core_app.API.Extensions;
 using hotelier_core_app.API.Helpers;
+using hotelier_core_app.Core.AutofacModule;
 using hotelier_core_app.Core.Constants;
+using hotelier_core_app.Core.Enums;
 using hotelier_core_app.Core.Interceptors;
+using hotelier_core_app.Domain.AutofacModule;
 using hotelier_core_app.Migrations;
 using hotelier_core_app.Model;
 using hotelier_core_app.Model.Configs;
 using hotelier_core_app.Model.Entities;
-using hotelier_core_app.API.Controllers;
+using hotelier_core_app.Service.AutofacModule;
 using hotelier_core_app.Service.AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Globalization;
 using System.Text;
 using System.Text.Json.Serialization;
-using hotelier_core_app.Service.AutofacModule;
-using hotelier_core_app.Core.AutofacModule;
-using hotelier_core_app.Domain.AutofacModule;
-using hotelier_core_app.Core.Enums;
 
 var builder = WebApplication.CreateBuilder(args);
+
+/// <summary>
+/// Entry point for the hotelier-core-app API application. Configures services, middleware, and application startup.
+/// </summary>
+// Register TenantProvider for multi-tenancy
+builder.Services.AddScoped<ITenantProvider, TenantProvider>();
 
 // Add services to the container.
 
@@ -48,7 +56,9 @@ builder.Services.AddControllers()
         };
     });
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DbConnectionString")));
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DbConnectionString"))
+           .ReplaceService<IModelCacheKeyFactory, TenantModelCacheKeyFactory>());
 
 builder.Services.AddApiVersioning(config =>
 {
@@ -180,6 +190,9 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     SupportedUICultures = supportedCultures
 });
 
+
+// Use TenantMiddleware before authentication/authorization
+app.UseTenantMiddleware();
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();

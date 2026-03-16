@@ -1,5 +1,8 @@
 ﻿namespace hotelier_core_app.Core.Constants
 {
+    /// <summary>
+    /// Contains standard response status codes used throughout the application.
+    /// </summary>
     public class ResponseStatusCode
     {
         public const string DuplicateKeyMessage = "001";
@@ -69,5 +72,10 @@
         public const string UserNotInPolicyGroup = "050";
         public const string PermissionDoesNotExist = "051";
         public const string PolicyDoesNotExist = "052";
+        
+        public const string UserFetchedSuccessfully = "053";
+        public const string UsersFetchFailed = "054";
+        public const string UsersRetrieved = "055";
+        public const string ModulesRetrieved = "056";
     }
 }

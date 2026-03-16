@@ -14,12 +14,12 @@ namespace hotelier_core_app.Domain.Commands.Implementation
     {
         private readonly IConfiguration _configuration;
         private readonly IExecuters _executers;
-        private readonly string _connectionString;
+        private readonly string? _connectionString;
         private readonly ISqlGenerator<TEntity> _sqlGenerator;
 
         private const int UniqueIndexExceptionNumber = 2601;
-        private NpgsqlConnection _connection;
-        private NpgsqlTransaction _transaction;
+        private NpgsqlConnection? _connection = null;
+        private NpgsqlTransaction? _transaction = null;
 
         public DapperDBCommandRepository(IConfiguration configuration, IExecuters executers, ISqlGenerator<TEntity> sqlGenerator)
         {
@@ -31,6 +31,8 @@ namespace hotelier_core_app.Domain.Commands.Implementation
 
         public object AddSoft(TEntity entity)
         {
+            if (_connectionString == null)
+                throw new InvalidOperationException("Database connection string is not configured.");
             IDictionary<string, object> obj = (IDictionary<string, object>)(object)_executers.ExecuteCommand<TEntity>(_connectionString, _sqlGenerator.GetInsertQuery(entity).GetSql(), _sqlGenerator.GetInsertQueryParams(entity));
             Dictionary<string, object> dictionary = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, object> item in obj)
@@ -41,11 +43,13 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             return dictionary["Id"];
         }
 
-        public async Task<object> AddSoftAsync(TEntity entity)
+        public async Task<object?> AddSoftAsync(TEntity entity)
         {
-            object id = null;
+            object? id = null;
             try
             {
+                if (_connectionString == null)
+                    throw new InvalidOperationException("Database connection string is not configured.");
                 dynamic val = await _executers.ExecuteCommandAsync<TEntity>(_connectionString, _sqlGenerator.GetInsertQuery(entity).GetSql(), _sqlGenerator.GetInsertQueryParams(entity));
                 if ((object)val != null)
                 {
@@ -66,13 +70,16 @@ namespace hotelier_core_app.Domain.Commands.Implementation
                 if (ex.SqlState == "23505")
                 {
                     SqlQuery uniqueSelectQuery = _sqlGenerator.GetUniqueSelectQuery(entity);
+                    if (_connectionString == null)
+                        throw new InvalidOperationException("Database connection string is not configured.");
                     TEntity obj2 = await _executers.ExecuteSingleReaderAsync<TEntity>(_connectionString, uniqueSelectQuery.GetSql(), uniqueSelectQuery.Param);
                     PropertyInfo[] properties = typeof(TEntity).GetProperties();
                     foreach (PropertyInfo propertyInfo in properties)
                     {
                         if (propertyInfo.Name.Equals("id", StringComparison.OrdinalIgnoreCase))
                         {
-                            id = propertyInfo.GetValue(obj2).ToString();
+                            var value = propertyInfo.GetValue(obj2);
+                            id = value != null ? value.ToString() : null;
                             break;
                         }
                     }
@@ -88,6 +95,8 @@ namespace hotelier_core_app.Domain.Commands.Implementation
         {
             try
             {
+                if (_connectionString == null)
+                    throw new InvalidOperationException("Database connection string is not configured.");
                 object obj = _executers.ExecuteCommand<TEntity>(_connectionString, _sqlGenerator.GetInsertQuery(entity).GetSql(), _sqlGenerator.GetInsertQueryParams(entity));
                 if (obj != null)
                 {
@@ -101,7 +110,7 @@ namespace hotelier_core_app.Domain.Commands.Implementation
                     return dictionary["Id"];
                 }
 
-                return null;
+                return null!;
             }
             catch (Exception ex)
             {
@@ -114,6 +123,8 @@ namespace hotelier_core_app.Domain.Commands.Implementation
         {
             try
             {
+                if (_connectionString == null)
+                    throw new InvalidOperationException("Database connection string is not configured.");
                 dynamic val = await _executers.ExecuteCommandAsync<TEntity>(_connectionString, _sqlGenerator.GetInsertQuery(entity).GetSql(), _sqlGenerator.GetInsertQueryParams(entity));
                 if ((object)val != null)
                 {
@@ -127,7 +138,7 @@ namespace hotelier_core_app.Domain.Commands.Implementation
                     return dictionary["Id"];
                 }
 
-                return null;
+                return null!;
             }
             catch (Exception ex)
             {
@@ -146,6 +157,8 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             try
             {
                 SqlQuery bulkInsertQuery = _sqlGenerator.GetBulkInsertQuery(entities);
+                if (_connectionString == null)
+                    throw new InvalidOperationException("Database connection string is not configured.");
                 await _executers.ExecuteCommandAsync<TEntity>(_connectionString, bulkInsertQuery.GetSql(), bulkInsertQuery.Param);
             }
             catch (Exception ex)
@@ -162,6 +175,7 @@ namespace hotelier_core_app.Domain.Commands.Implementation
 
         public async Task AddRangeWithTransactionAsync(List<TEntity> entity, NpgsqlTransaction transaction)
         {
+            await Task.CompletedTask;
             throw new NotImplementedException();
         }
 
@@ -253,46 +267,89 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             }
         }
 
+        /// <summary>
+        /// Deletes an entity by its identifier.
+        /// </summary>
+        /// <param name="id">The identifier of the entity to delete.</param>
         public void Delete(object id)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Asynchronously deletes an entity by its identifier.
+        /// </summary>
+        /// <param name="id">The identifier of the entity to delete.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task DeleteAsync(object id)
         {
+            await Task.CompletedTask;
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Deletes an entity by its identifier within a transaction.
+        /// </summary>
+        /// <param name="id">The identifier of the entity to delete.</param>
+        /// <param name="transaction">The transaction to use for the operation.</param>
         public void DeleteWithTransaction(object id, NpgsqlTransaction transaction)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Asynchronously deletes an entity by its identifier within a transaction.
+        /// </summary>
+        /// <param name="id">The identifier of the entity to delete.</param>
+        /// <param name="transaction">The transaction to use for the operation.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task DeleteWithTransactionAsync(object id, NpgsqlTransaction transaction)
         {
+            await Task.CompletedTask;
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Rolls back the specified transaction.
+        /// </summary>
+        /// <param name="sqlTransaction">The transaction to roll back.</param>
         public void RollBackTransaction(NpgsqlTransaction sqlTransaction)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Asynchronously rolls back the specified transaction.
+        /// </summary>
+        /// <param name="sqlTransaction">The transaction to roll back.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task RollBackTransactionAsync(NpgsqlTransaction sqlTransaction)
         {
+            await Task.CompletedTask;
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Updates the specified entity.
+        /// </summary>
+        /// <param name="entity">The entity to update.</param>
         public void Update(TEntity entity)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Asynchronously updates the specified entity.
+        /// </summary>
+        /// <param name="entity">The entity to update.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task UpdateAsync(TEntity entity)
         {
             try
             {
                 SqlQuery updateQuery = _sqlGenerator.GetUpdateQuery(entity);
+                if (_connectionString == null)
+                    throw new InvalidOperationException("Database connection string is not configured.");
                 await _executers.ExecuteCommandAsync<TEntity>(_connectionString, updateQuery.GetSql(), updateQuery.Param);
             }
             catch (Exception)
@@ -301,6 +358,11 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             }
         }
 
+        /// <summary>
+        /// Updates the specified entity within a transaction.
+        /// </summary>
+        /// <param name="entity">The entity to update.</param>
+        /// <param name="transaction">The transaction to use for the operation.</param>
         public void UpdateWithTransaction(TEntity entity, NpgsqlTransaction transaction)
         {
             try
@@ -315,6 +377,12 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             }
         }
 
+        /// <summary>
+        /// Asynchronously updates the specified entity within a transaction.
+        /// </summary>
+        /// <param name="entity">The entity to update.</param>
+        /// <param name="transaction">The transaction to use for the operation.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task UpdateWithTransactionAsync(TEntity entity, NpgsqlTransaction transaction)
         {
             try
@@ -329,11 +397,17 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             }
         }
 
+        /// <summary>
+        /// Updates a range of entities.
+        /// </summary>
+        /// <param name="entities">The entities to update.</param>
         public void UpdateRange(IEnumerable<TEntity> entities)
         {
             try
             {
                 SqlQuery bulkUpdateQuery = _sqlGenerator.GetBulkUpdateQuery(entities);
+                if (_connectionString == null)
+                    throw new InvalidOperationException("Database connection string is not configured.");
                 _executers.ExecuteCommand<TEntity>(_connectionString, bulkUpdateQuery.GetSql(), bulkUpdateQuery.Param);
             }
             catch (Exception)
@@ -342,11 +416,18 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             }
         }
 
+        /// <summary>
+        /// Asynchronously updates a range of entities.
+        /// </summary>
+        /// <param name="entities">The entities to update.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task UpdateRangeAsync(IEnumerable<TEntity> entities)
         {
             try
             {
                 SqlQuery bulkUpdateQuery = _sqlGenerator.GetBulkUpdateQuery(entities);
+                if (_connectionString == null)
+                    throw new InvalidOperationException("Database connection string is not configured.");
                 await _executers.ExecuteCommandAsync<TEntity>(_connectionString, bulkUpdateQuery.GetSql(), bulkUpdateQuery.Param);
             }
             catch (Exception)
@@ -355,41 +436,77 @@ namespace hotelier_core_app.Domain.Commands.Implementation
             }
         }
 
+        /// <summary>
+        /// Saves changes to the database.
+        /// </summary>
+        /// <returns>The number of affected rows.</returns>
         public int Save()
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Asynchronously saves changes to the database.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation, with the number of affected rows.</returns>
         public async Task<int> SaveAsync()
         {
+            await Task.CompletedTask;
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Updates a range of entities within a transaction.
+        /// </summary>
+        /// <param name="entities">The entities to update.</param>
+        /// <param name="transaction">The transaction to use for the operation.</param>
         public void UpdateRangeWithTransaction(IEnumerable<TEntity> entities, NpgsqlTransaction transaction)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Asynchronously updates a range of entities within a transaction.
+        /// </summary>
+        /// <param name="entities">The entities to update.</param>
+        /// <param name="transaction">The transaction to use for the operation.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public Task UpdateRangeWithTransactionAsync(IEnumerable<TEntity> entities, NpgsqlTransaction transaction)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Deletes the specified entity.
+        /// </summary>
+        /// <param name="entity">The entity to delete.</param>
         public void Delete(TEntity entity)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Deletes a range of entities.
+        /// </summary>
+        /// <param name="entity">The entities to delete.</param>
         public void DeleteRange(List<TEntity> entity)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Attaches the specified entity to the context.
+        /// </summary>
+        /// <param name="entity">The entity to attach.</param>
         public void AttachEntity(TEntity entity)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Switches the database provider.
+        /// </summary>
+        /// <param name="provider">The database provider to switch to.</param>
         public void SwitchProvider(DBProvider provider)
         {
         }

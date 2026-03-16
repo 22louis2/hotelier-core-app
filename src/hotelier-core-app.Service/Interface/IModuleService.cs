@@ -21,5 +21,7 @@ namespace hotelier_core_app.Service.Interface
         Task<BaseResponse> DeleteModule(long id, AuditLog auditLog);
 
         Task<BaseResponse<List<ModuleDTO>>> GetAllModule();
+
+        BaseResponse<List<ModuleGroupDTO>> GetAssignedModules(List<string> roles);
     }
 }

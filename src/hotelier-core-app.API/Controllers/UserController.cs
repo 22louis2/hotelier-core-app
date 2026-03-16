@@ -110,8 +110,10 @@ namespace hotelier_core_app.API.Controllers
             var (response, refreshToken) = await _userService.Login(model, auditLog);
             if (response.Status)
             {
-                Response.Headers.TryAdd("Token", _tokenHelper.GenerateJSONWebToken(response.Data.FullName, response.Data.Email, 
-                    response.Data.Roles ?? Enumerable.Empty<string>().ToList()));
+                Response.Headers.TryAdd("Token", _tokenHelper.GenerateJSONWebToken(
+                    response.Data?.FullName ?? string.Empty,
+                    response.Data?.Email ?? string.Empty,
+                    response.Data?.Roles ?? Enumerable.Empty<string>().ToList()));
                 Response.Headers.TryAdd("TokenExpiry", _jwtConfig.Value.TokenExpiryPeriod);
                 Response.Headers.TryAdd("Access-Control-Expose-Headers", "Token,TokenExpiry,RefreshToken");
                 Response.Headers.TryAdd("RefreshToken", refreshToken);
@@ -137,12 +139,63 @@ namespace hotelier_core_app.API.Controllers
             var (response, refreshToken) = await _userService.RefreshToken(model, auditLog);
             if (response.Status)
             {
-                Response.Headers.TryAdd("Token", _tokenHelper.GenerateJSONWebToken(response.Data.FullName, response.Data.Email, 
-                    response.Data.Roles ?? Enumerable.Empty<string>().ToList()));
+                Response.Headers.TryAdd("Token", _tokenHelper.GenerateJSONWebToken(
+                    response.Data?.FullName ?? string.Empty,
+                    response.Data?.Email ?? string.Empty,
+                    response.Data?.Roles ?? Enumerable.Empty<string>().ToList()));
                 Response.Headers.TryAdd("TokenExpiry", _jwtConfig.Value.TokenExpiryPeriod);
                 Response.Headers.TryAdd("Access-Control-Expose-Headers", "Token,TokenExpiry,RefreshToken");
                 Response.Headers.TryAdd("RefreshToken", refreshToken);
             }
+            return Ok(response);
+        }
+        
+        
+        [HttpPut("reassign-role")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse))]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(ValidationResultModel))]
+        public async Task<IActionResult> ReassignRole(EditUserRolesRequestDTO model)
+        {
+            var auditLog = new AuditLog
+            {
+                Action = UserAction.ReassignRole,
+                DatePerformed = DateTime.UtcNow,
+                PerformedBy = _tokenHelper.GetUserFullName(Request),
+                PerformerEmail = _tokenHelper.GetUserEmail(Request),
+                PerformedAgainst = model.Email,
+                IpAddress = _accessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown IP",
+                MacAddress = _tokenHelper.GetMacAddress(Request)
+            };
+
+            var response = await _userService.ReassignRole(model, auditLog);
+            return Ok(response);
+        }
+
+        [HttpGet("get-user-by-email")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse<ApplicationUserDTO>))]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
+        public async Task<IActionResult> GetUserByEmail(string email)
+        {
+            var response = await _userService.GetUserByEmail(email);
+            return Ok(response);
+        }
+
+        [HttpPost("get-users")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(PageBaseResponse<List<ApplicationUserDTO>>))]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
+        public async Task<IActionResult> GetUsers(PageParamsDTO model)
+        {
+            var response = await _userService.GetUsers(model);
+            return Ok(response);
+        }
+
+        [HttpGet("get-assigned-modules")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(BaseResponse<List<ModuleGroupDTO>>))]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(BaseResponse))]
+        public async Task<IActionResult> GetAssignedModules(string email)
+        {
+            var response = await _userService.GetAssignedModules(email);
             return Ok(response);
         }
     }

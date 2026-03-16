@@ -1,7 +1,15 @@
 ﻿namespace hotelier_core_app.Core.Helpers
 {
+    /// <summary>
+    /// Helper class for generating query string parameters from objects.
+    /// </summary>
     public class QueryHelper
     {
+        /// <summary>
+        /// Generates a query string from the properties of the given object.
+        /// </summary>
+        /// <param name="queryObject">The object containing query parameters.</param>
+        /// <returns>A query string representing the object's properties.</returns>
         public static string GenerateQueryParams(object queryObject)
         {
             string query = string.Empty;

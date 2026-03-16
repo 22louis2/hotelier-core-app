@@ -4,7 +4,7 @@ using hotelier_core_app.Model.Entities;
 
 namespace hotelier_core_app.Service.Interface
 {
-    public interface IRoleService: IAutoDependencyService
+    public interface IRoleService : IAutoDependencyService
     {
         Task<BaseResponse> CreateRoleAsync(CreateRoleRequestDTO request, AuditLog auditLog);
         Task<BaseResponse<RoleResponseDTO>> GetRoleByIdAsync(long roleId);

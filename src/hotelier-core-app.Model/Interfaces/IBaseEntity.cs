@@ -2,7 +2,7 @@
 {
     public interface IBaseEntity
     {
-        string CreatedBy { get; set; }
+        string? CreatedBy { get; set; }
         string? ModifiedBy { get; set; }
         DateTime CreationDate { get; set; }
         DateTime? LastModifiedDate { get; set; }

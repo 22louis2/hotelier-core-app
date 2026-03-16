@@ -1,10 +1,31 @@
 ﻿namespace hotelier_core_app.Model.DTOs.Response
 {
+    /// <summary>
+    /// Base response class for API responses.
+    /// </summary>
     public class BaseResponse
     {
+        /// <summary>
+        /// Gets or sets the status of the response.
+        /// </summary>
         public bool Status { get; set; }
-        public string StatusCode { get; set; }
-        public string Message { get; set; }
+
+        /// <summary>
+        /// Gets or sets the status code of the response.
+        /// </summary>
+        public string? StatusCode { get; set; }
+
+        /// <summary>
+        /// Gets or sets the message associated with the response.
+        /// </summary>
+        public string? Message { get; set; }
+
+        /// <summary>
+        /// Creates a successful response.
+        /// </summary>
+        /// <param name="message">The success message.</param>
+        /// <param name="statusCode">The status code.</param>
+        /// <returns>A new <see cref="BaseResponse"/> instance representing success.</returns>
         public static BaseResponse Success(string message = "", string statusCode = "")
         {
             return new BaseResponse()
@@ -15,6 +36,12 @@
             };
         }
 
+        /// <summary>
+        /// Creates a failure response.
+        /// </summary>
+        /// <param name="message">The error message.</param>
+        /// <param name="statusCode">The status code.</param>
+        /// <returns>A new <see cref="BaseResponse"/> instance representing failure.</returns>
         public static BaseResponse Failure(string message = "", string statusCode = "")
         {
             return new BaseResponse()
@@ -25,9 +52,24 @@
         }
     }
 
+    /// <summary>
+    /// Generic base response class for API responses with data.
+    /// </summary>
+    /// <typeparam name="T">The type of the data returned in the response.</typeparam>
     public class BaseResponse<T> : BaseResponse
     {
-        public T Data { get; set; }
+        /// <summary>
+        /// Gets or sets the data returned in the response.
+        /// </summary>
+        public T? Data { get; set; }
+
+        /// <summary>
+        /// Creates a successful response with data.
+        /// </summary>
+        /// <param name="data">The data to return.</param>
+        /// <param name="message">The success message.</param>
+        /// <param name="statusCode">The status code.</param>
+        /// <returns>A new <see cref="BaseResponse{T}"/> instance representing success.</returns>
         public static BaseResponse<T> Success(T data, string message = "", string statusCode = "")
         {
             return new BaseResponse<T>()
@@ -52,7 +94,7 @@
 
     public class PageBaseResponse<T> : BaseResponse
     {
-        public T Data { get; set; }
+        public T? Data { get; set; }
         public int? DataCount { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }

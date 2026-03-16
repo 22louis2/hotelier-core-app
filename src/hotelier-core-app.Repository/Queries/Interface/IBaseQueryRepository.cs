@@ -6,7 +6,7 @@ namespace hotelier_core_app.Domain.Queries.Interface
     {
         TEntity Find(object id);
 
-        Task<TEntity> FindAsync(object id);
+        Task<TEntity?> FindAsync(object id);
 
         IEnumerable<TEntity> GetAll();
 
