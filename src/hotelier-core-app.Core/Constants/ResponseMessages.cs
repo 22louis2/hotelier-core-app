@@ -36,12 +36,15 @@
         public const string LoginSuccessful = "Login successful";
         public const string CantVerifyToken = "Can't Verify Token";
         public const string CantVerifyRefreshToken = "Can't Verify Refresh Token";
+        public const string UsersRetrieved = "Users Retrieved successfully";
+        public const string UsersFetchFailed = "User Fetch Failed";
 
         //User Role
         public const string RoleExist = "Role with this name already exist";
         public const string RoleNotExist = "This role does not already exist";
         public const string RoleCreated = "Role created successfully";
         public const string RoleUpdated = "Role updated successfully";
+        public const string RoleReassignmentError = "Role reassignment error";
 
         //Module Service
         public const string ModuleGroupUpdated = "Dashboard detail is updated";
@@ -53,12 +56,28 @@
         public const string ModuleExist = "Module already exist";
         public const string ModuleUpdateValidation = "Either of the module field is required";
         public const string NoModuleAccess = "No module access found for user";
+        public const string ModulesRetrieved = "Modules Retrieved successfully";
 
         public const string EmailSent = "An email has been successfully sent to the user";
         public const string EmailFailed = "Failed to send the email. Please try again later";
 
         public const string InvalidCredential = "Invalid Credentials";
         public const string UserEmailNotConfirmed = "User's email has not been confirmed";
+
+        // Subscription service
+        public const string SubscriptionExist = "Subscription already exist";
+        public const string SubscriptionNotExist = "Subscription does not exist";
+        public const string SubscriptionCreated = "Subscription created successfully";
+        public const string SubscriptionUpdated = "Subscription updated successfully";
+        public const string SubscriptionRemoved = "Subscription removed successfully";
+        public const string Subscribed = "Subscribed to plan successfully";
+
+        // Policy Group Management
+        public const string PolicyGroupExists = "A policy with this name already exists for this tenant";
+        public const string PolicyGroupDoesNotExist = "The specified policy group does not exist";
+        public const string UserNotInPolicyGroup = "The user is not in the specified policy group";
+        public const string PermissionDoesNotExist = "The specified permission does not exist";
+        public const string PolicyDoesNotExist = "The specified policy does not exist";
 
         // Property Management
         public const string TenantNotExisting = "Tenant does not exist";
